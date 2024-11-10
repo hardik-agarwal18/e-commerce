@@ -13,7 +13,9 @@ app.use(cors());
 
 // Database connection with mongodb
 mongoose.connect(
-  "mongodb+srv://work18hk19:himanshi18hk19@cluster0.wqkl1.mongodb.net/e-commerce"
+  "mongodb+srv://" +
+    process.env.MONGODB_KEY +
+    "@cluster0.wqkl1.mongodb.net/e-commerce"
 );
 
 // Api Creation
