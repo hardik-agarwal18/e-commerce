@@ -46,7 +46,7 @@ app.post("/upload", upload.single("product"), (req, res) => {
   });
 });
 
-// Schema fo rCreating products
+// Schema fo Creating products
 
 const Product = mongoose.model("Product", {
   id: {

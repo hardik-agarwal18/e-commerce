@@ -6,4 +6,4 @@ admin/node_modules/
 # Optionally ignore logs and environment files
 *.log
 .env
-backend/.env
+/backend/.env
