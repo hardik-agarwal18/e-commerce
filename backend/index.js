@@ -54,7 +54,6 @@ app.post("/upload", upload.single("product"), (req, res) => {
 });
 
 // Schema fo Creating products
-
 const Product = mongoose.model("Product", {
   id: {
     type: Number,
@@ -117,7 +116,6 @@ app.post("/addproduct", async (req, res) => {
 });
 
 // Creating Api fo Deleting Product
-
 app.post("/removeproduct", async (req, res) => {
   await Product.findOneAndDelete({ id: req.body.id });
   console.log("Removed");
@@ -128,7 +126,6 @@ app.post("/removeproduct", async (req, res) => {
 });
 
 // Creating Api fo Getting all Product
-
 app.get("/allproducts", async (req, res) => {
   let products = await Product.find({});
   console.log("All Products Fetched");
@@ -136,7 +133,6 @@ app.get("/allproducts", async (req, res) => {
 });
 
 // Creating schema for User Model
-
 const Users = mongoose.model("User", {
   name: { type: String },
   email: {
@@ -176,8 +172,25 @@ app.post("/signup", async (req, res) => {
 
   res.status(200).json({
     success: true,
+    token,
     message: "User Created",
   });
+});
+
+// Creating Endpoint for login
+app.post("/login", async (req, res) => {
+  let user = await Users.findOne({ email: req.body.email });
+  if (!user) {
+    return res.status(400).json({ success: false, message: "User not exists" });
+  }
+  const passCompare = req.body.password === user.password;
+  if (!passCompare) {
+    return res.status(400).json({ success: false, message: "Wrong Password" });
+  }
+  const data = { user: { id: user.id } };
+
+  const token = jwt.sign(data, "secret_ecom");
+  res.json({ success: true, token, message: "User Logged in" });
 });
 
 app.listen(port, (error) => {
