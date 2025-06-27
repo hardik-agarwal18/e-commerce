@@ -1,11 +1,11 @@
 import React, { useContext, useRef, useState } from "react";
 import "./Navbar.css";
 
-import logo from "../Assets/logo.png";
-import cart_icon from "../Assets/cart_icon.png";
+import logo from "../../Assets/logo.png";
+import cart_icon from "../../Assets/cart_icon.png";
 import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
-import nav_dropdown from "../Assets/nav_dropdown.png";
+import nav_dropdown from "../../Assets/nav_dropdown.png";
 
 //Navbar component to display the website logo and navigation links.
 const Navbar = () => {

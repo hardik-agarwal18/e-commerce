@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import "./CartItems.css";
 import { ShopContext } from "../../Context/ShopContext";
-import remove_icon from "../Assets/cart_cross_icon.png";
+import remove_icon from "../../Assets/cart_cross_icon.png";
 // TODO: Implement cart items display and functionality such as updating quantity, removing items, and calculating total price.
 const CartItems = () => {
   const { getTotalcartAmount, all_product, cartItems, removeFromCart } =
