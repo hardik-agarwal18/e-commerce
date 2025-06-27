@@ -7,17 +7,24 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 const { log } = require("console");
+const { type } = require("os");
+const dotenv = require("dotenv");
 
+dotenv.config();
 app.use(express.json());
 app.use(cors());
 
 // Database connection with mongodb
-mongoose.connect(
-  "mongodb+srv://" +
-    process.env.MONGODB_KEY +
-    "@cluster0.wqkl1.mongodb.net/e-commerce"
-);
-
+const connectDatabase = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_KEY);
+    console.log("✅ MongoDB connected successfully.");
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message);
+    process.exit(1);
+  }
+};
+connectDatabase();
 // Api Creation
 app.get("/", (req, res) => {
   res.send("Express App is Running");
@@ -126,6 +133,51 @@ app.get("/allproducts", async (req, res) => {
   let products = await Product.find({});
   console.log("All Products Fetched");
   res.send(products);
+});
+
+// Creating schema for User Model
+
+const Users = mongoose.model("User", {
+  name: { type: String },
+  email: {
+    type: String,
+    unique: true,
+  },
+  password: { type: String },
+  cartData: { type: Object },
+  date: { type: Date, default: Date.now },
+});
+
+// Creating API for registering the user
+app.post("/signup", async (req, res) => {
+  let check = await Users.findOne({ email: req.body.email });
+  if (check) {
+    return res.status(400).json({ success: false, message: "User Exists" });
+  }
+  let cart = {};
+  for (let i = 0; i < 300; i++) {
+    cart[i] = 0;
+  }
+  const user = new Users({
+    name: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    cartData: cart,
+  });
+
+  await user.save();
+
+  const data = {
+    user: {
+      id: user.id,
+    },
+  };
+  const token = jwt.sign(data, "secret_ecom");
+
+  res.status(200).json({
+    success: true,
+    message: "User Created",
+  });
 });
 
 app.listen(port, (error) => {
