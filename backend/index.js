@@ -1,4 +1,3 @@
-const port = 4000;
 import express from "express";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
@@ -6,10 +5,13 @@ import multer from "multer";
 import path from "path";
 import cors from "cors";
 import dotenv from "dotenv";
+
 import connectDatabase from "./config/db.js";
+import AuthRoutes from "./routes/AuthRoutes.js";
 
 dotenv.config();
 
+const PORT = process.env.PORT || 4000;
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -124,70 +126,11 @@ app.get("/allproducts", async (req, res) => {
   res.send(products);
 });
 
-// Creating schema for User Model
-const Users = mongoose.model("User", {
-  name: { type: String },
-  email: {
-    type: String,
-    unique: true,
-  },
-  password: { type: String },
-  cartData: { type: Object },
-  date: { type: Date, default: Date.now },
-});
+app.use("/api/auth", AuthRoutes);
 
-// Creating API for registering the user
-app.post("/signup", async (req, res) => {
-  let check = await Users.findOne({ email: req.body.email });
-  if (check) {
-    return res.status(400).json({ success: false, message: "User Exists" });
-  }
-  let cart = {};
-  for (let i = 0; i < 300; i++) {
-    cart[i] = 0;
-  }
-  const user = new Users({
-    name: req.body.username,
-    email: req.body.email,
-    password: req.body.password,
-    cartData: cart,
-  });
-
-  await user.save();
-
-  const data = {
-    user: {
-      id: user.id,
-    },
-  };
-  const token = jwt.sign(data, "secret_ecom");
-
-  res.status(200).json({
-    success: true,
-    token,
-    message: "User Created",
-  });
-});
-
-// Creating Endpoint for login
-app.post("/login", async (req, res) => {
-  let user = await Users.findOne({ email: req.body.email });
-  if (!user) {
-    return res.status(400).json({ success: false, message: "User not exists" });
-  }
-  const passCompare = req.body.password === user.password;
-  if (!passCompare) {
-    return res.status(400).json({ success: false, message: "Wrong Password" });
-  }
-  const data = { user: { id: user.id } };
-
-  const token = jwt.sign(data, "secret_ecom");
-  res.json({ success: true, token, message: "User Logged in" });
-});
-
-app.listen(port, (error) => {
+app.listen(PORT, (error) => {
   if (!error) {
-    console.log("Server Running on port " + port);
+    console.log("Server Running on Port " + PORT);
   } else {
     console.log("Error in the Server:" + error);
   }
