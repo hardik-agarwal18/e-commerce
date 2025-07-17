@@ -12,13 +12,23 @@ const Navbar = () => {
   const [menu, setMenu] = useState("shop");
   const { getTotalCartItems } = useContext(ShopContext);
   const menuRef = useRef();
+
+  const dropdown_toggle = (e) => {
+    menuRef.current.classList.toggle("nav-menu-visible");
+    e.target.classList.toggle("open");
+  };
   return (
     <div className="navbar">
       <div className="nav-logo">
         <img src={logo} alt="Logo" />
         <p>SHOPPER</p>
       </div>
-      <img src={nav_dropdown} alt="" />
+      <img
+        className="nav-dropdown"
+        src={nav_dropdown}
+        alt=""
+        onClick={dropdown_toggle}
+      />
       <ul ref={menuRef} className="nav-menu">
         <li
           onClick={() => {
