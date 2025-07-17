@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./AddProduct.css";
 import upload_area from "../../assets/upload_area.svg";
+import { axiosInstance } from "../../lib/axios";
 
 const AddProduct = () => {
   const [image, setImage] = useState(false);
@@ -20,41 +21,35 @@ const AddProduct = () => {
 
   const Add_Product = async () => {
     console.log(productDetails);
-    let responseData;
     let product = productDetails;
 
     let formData = new FormData();
     formData.append("product", image);
 
-    await fetch("http://localhost:4000/upload", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-      body: formData,
-    })
-      .then((resp) => resp.json())
-      .then((data) => {
-        responseData = data;
+    try {
+      // Upload image first
+      const uploadRes = await axiosInstance.post("/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-    if (responseData.success) {
-      product.image = responseData.image_url;
-      console.log(product);
-      await fetch("http://localhost:4000/addproduct", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(product),
-      })
-        .then((resp) => resp.json())
-        .then((data) => {
-          data.success
-            ? alert("Product added successfully")
-            : alert("Failed to add product");
-        });
+      if (uploadRes.data.success) {
+        product.image = uploadRes.data.image_url;
+        console.log(product);
+
+        // Add product
+        const addProductRes = await axiosInstance.post("/addproduct", product);
+
+        if (addProductRes.data.success) {
+          alert("Product added successfully");
+        } else {
+          alert("Failed to add product");
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to add product");
     }
   };
 
