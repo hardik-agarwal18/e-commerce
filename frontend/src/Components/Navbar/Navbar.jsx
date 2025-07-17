@@ -6,6 +6,7 @@ import cart_icon from "../../Assets/cart_icon.png";
 import { Link } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
 import nav_dropdown from "../../Assets/nav_dropdown.png";
+import { axiosInstance } from "../../lib/axios";
 
 //Navbar component to display the website logo and navigation links.
 const Navbar = () => {
@@ -16,6 +17,19 @@ const Navbar = () => {
   const dropdown_toggle = (e) => {
     menuRef.current.classList.toggle("nav-menu-visible");
     e.target.classList.toggle("open");
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Call backend logout API to clear HTTP-only cookies
+      await axiosInstance.post("/api/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Always remove local token and redirect, even if API call fails
+      localStorage.removeItem("auth-token");
+      window.location.replace("/");
+    }
   };
   return (
     <div className="navbar">
@@ -73,14 +87,7 @@ const Navbar = () => {
       </ul>
       <div className="nav-login-cart">
         {localStorage.getItem("auth-token") ? (
-          <button
-            onClick={() => {
-              localStorage.removeItem("auth-token");
-              window.location.replace("/");
-            }}
-          >
-            Logout
-          </button>
+          <button onClick={handleLogout}>Logout</button>
         ) : (
           <Link to="/login">
             <button>Login</button>
