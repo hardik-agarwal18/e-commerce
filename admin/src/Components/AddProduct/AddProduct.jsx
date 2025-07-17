@@ -39,7 +39,10 @@ const AddProduct = () => {
         console.log(product);
 
         // Add product
-        const addProductRes = await axiosInstance.post("/addproduct", product);
+        const addProductRes = await axiosInstance.post(
+          "/products/addproduct",
+          product
+        );
 
         if (addProductRes.data.success) {
           alert("Product added successfully");
