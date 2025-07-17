@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./CSS/LoginSignup.css";
+import { axiosInstance } from "../lib/axios";
 
 export const LoginSignup = () => {
   const [state, setState] = useState("Login");
@@ -17,46 +18,43 @@ export const LoginSignup = () => {
   const login = async () => {
     console.log("Login Function", formData);
 
-    let responseData;
-    await fetch("http://localhost:4000/login", {
-      method: "POST",
-      headers: {
-        Accept: "application/form-data",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then((data) => (responseData = data));
+    try {
+      const response = await axiosInstance.post("/api/auth/login", {
+        email: formData.email,
+        password: formData.password,
+      });
 
-    if (responseData.success) {
-      localStorage.setItem("auth-token", responseData.token);
-      window.location.replace("/");
-    } else {
-      alert(responseData.errors || responseData.message);
+      if (response.data.success) {
+        localStorage.setItem("auth-token", response.data.token);
+        window.location.replace("/");
+      } else {
+        alert(response.data.errors || response.data.message);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 
   const signup = async () => {
     console.log("SignUp Function", formData);
 
-    let responseData;
-    await fetch("http://localhost:4000/signup", {
-      method: "POST",
-      headers: {
-        Accept: "application/form-data",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then((data) => (responseData = data));
+    try {
+      const response = await axiosInstance.post("/api/auth/signup", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
 
-    if (responseData.success) {
-      localStorage.setItem("auth-token", responseData.token);
-      window.location.replace("/");
-    } else {
-      alert(responseData.errors || responseData.message);
+      if (response.data.success) {
+        localStorage.setItem("auth-token", response.data.token);
+        window.location.replace("/");
+      } else {
+        alert(response.data.errors || response.data.message);
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert(error.response?.data?.message || "Signup failed");
     }
   };
   return (
