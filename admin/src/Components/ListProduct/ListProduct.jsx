@@ -1,30 +1,31 @@
 import { useEffect, useState } from "react";
 import "./ListProduct.css";
 import cross_icon from "../../assets/cross_icon.png";
+import { axiosInstance } from "../../lib/axios";
 
 const ListProduct = () => {
   const [allProducts, setAllProducts] = useState([]);
+
   const fetchInfo = async () => {
-    await fetch("http://localhost:4000/allproducts")
-      .then((res) => res.json())
-      .then((data) => {
-        setAllProducts(data);
-      });
+    try {
+      const response = await axiosInstance.get("/products/getallproducts");
+      setAllProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
   };
+
   useEffect(() => {
     fetchInfo();
   }, []);
 
   const remove_product = async (id) => {
-    await fetch(`http://localhost:4000/removeproduct/`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: id }),
-    });
-    await fetchInfo();
+    try {
+      await axiosInstance.post("/products/removeproduct", { id: id });
+      await fetchInfo();
+    } catch (error) {
+      console.error("Error removing product:", error);
+    }
   };
   return (
     <div className="list-product">
@@ -54,7 +55,6 @@ const ListProduct = () => {
                 <p>{product.name}</p>
                 <p>${product.old_price}</p>
                 <p>${product.new_price}</p>
-                <p>{product.category}</p>
                 <p>{product.category}</p>
                 <img
                   onClick={() => {
