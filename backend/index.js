@@ -1,30 +1,22 @@
 const port = 4000;
-const express = require("express");
-const app = express();
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const path = require("path");
-const cors = require("cors");
-const { log } = require("console");
-const { type } = require("os");
-const dotenv = require("dotenv");
+import express from "express";
+import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import multer from "multer";
+import path from "path";
+import cors from "cors";
+import dotenv from "dotenv";
+import connectDatabase from "./config/db.js";
 
 dotenv.config();
+
+const app = express();
 app.use(express.json());
 app.use(cors());
 
 // Database connection with mongodb
-const connectDatabase = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_KEY);
-    console.log("✅ MongoDB connected successfully.");
-  } catch (error) {
-    console.error("❌ MongoDB connection failed:", error.message);
-    process.exit(1);
-  }
-};
 connectDatabase();
+
 // Api Creation
 app.get("/", (req, res) => {
   res.send("Express App is Running");
