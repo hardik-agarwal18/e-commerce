@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const Products = mongoose.model("Product", {
+const Product = mongoose.model("Product", {
   id: {
     type: Number,
     required: true,
@@ -35,4 +35,4 @@ const Products = mongoose.model("Product", {
   },
 });
 
-export default Products;
+export default Product;

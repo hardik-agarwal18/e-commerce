@@ -26,23 +26,6 @@ app.get("/", (req, res) => {
 
 app.use("/images", express.static("upload/images"));
 
-// Creating Api fo Deleting Product
-app.post("/removeproduct", async (req, res) => {
-  await Product.findOneAndDelete({ id: req.body.id });
-  console.log("Removed");
-  res.json({
-    success: true,
-    name: req.body.name,
-  });
-});
-
-// Creating Api fo Getting all Product
-app.get("/allproducts", async (req, res) => {
-  let products = await Product.find({});
-  console.log("All Products Fetched");
-  res.send(products);
-});
-
 app.use("/api/auth", AuthRoutes);
 app.use("/api/products", ProductRoutes);
 app.use("/api/upload", UploadRoutes);
