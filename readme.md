@@ -45,6 +45,7 @@ A full-stack e-commerce application built with React.js, Node.js, Express.js, an
 │   │   ├── Pages/        # Main application pages
 │   │   ├── Context/      # React context for state management
 │   │   └── Assets/       # Static assets and images
+│   ├── public/          # Public assets
 │   └── package.json
 ├── ⚙️ backend/           # Node.js & Express.js API
 │   ├── controllers/      # Business logic controllers
@@ -52,13 +53,18 @@ A full-stack e-commerce application built with React.js, Node.js, Express.js, an
 │   ├── routes/          # API route definitions
 │   ├── middleware/      # Custom middleware functions
 │   ├── config/          # Database configuration
+│   ├── upload/          # Uploaded files storage
+│   ├── .env             # Environment variables (create this)
 │   └── package.json
-└── 🔐 admin/             # React.js admin dashboard
-    ├── src/
-    │   ├── Components/   # Admin-specific components
-    │   ├── Pages/        # Admin dashboard pages
-    │   └── lib/          # Utility libraries
-    └── package.json
+├── 🔐 admin/             # React.js admin dashboard
+│   ├── src/
+│   │   ├── Components/   # Admin-specific components
+│   │   ├── Pages/        # Admin dashboard pages
+│   │   └── lib/          # Utility libraries
+│   ├── public/          # Public assets
+│   └── package.json
+├── .gitignore           # Git ignore rules
+└── README.md            # Project documentation
 ```
 
 ## 🛠️ Tech Stack
@@ -80,6 +86,9 @@ A full-stack e-commerce application built with React.js, Node.js, Express.js, an
 - **Bcrypt** - Password hashing
 - **Multer** - File upload handling
 - **CORS** - Cross-origin resource sharing
+- **Dotenv** - Environment variable management
+- **Cookie Parser** - Cookie parsing middleware
+- **Nodemon** - Development server auto-restart
 
 ### Admin Panel
 
@@ -92,9 +101,10 @@ A full-stack e-commerce application built with React.js, Node.js, Express.js, an
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v16 or higher)
 - MongoDB (local or cloud instance)
 - npm or yarn package manager
+- Git for version control
 
 ### Installation
 
@@ -111,10 +121,11 @@ A full-stack e-commerce application built with React.js, Node.js, Express.js, an
    cd backend
    npm install
 
-   # Create .env file with the following variables:
+   # Create .env file in the backend directory with the following variables:
    # PORT=4000
    # MONGODB_URI=your_mongodb_connection_string
    # JWT_SECRET=your_jwt_secret_key
+   # NODE_ENV=development
 
    npm run dev
    ```
@@ -184,14 +195,59 @@ A full-stack e-commerce application built with React.js, Node.js, Express.js, an
 ```env
 PORT=4000
 MONGODB_URI=mongodb://localhost:27017/ecommerce
-JWT_SECRET=your_super_secret_jwt_key
+# For MongoDB Atlas: mongodb+srv://username:password@cluster.mongodb.net/ecommerce
+JWT_SECRET=your_super_secret_jwt_key_min_32_characters
 NODE_ENV=development
 ```
+
+**Important Notes:**
+
+- Place the `.env` file in the `backend/` directory
+- Use a strong JWT secret (minimum 32 characters)
+- For production, use MongoDB Atlas or a secure database connection
+- Never commit `.env` files to version control
 
 ### Database Models
 
 - **User Model**: User authentication and profile data
 - **Product Model**: Product information, pricing, and inventory
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Backend not starting:**
+
+- Ensure MongoDB is running (local) or connection string is correct (cloud)
+- Check if `.env` file exists in `backend/` directory
+- Verify all required environment variables are set
+- Run `npm install` in backend directory
+
+**Frontend connection errors:**
+
+- Verify backend is running on port 4000
+- Check CORS configuration in backend
+- Ensure API endpoints are correct
+
+**Admin panel not loading:**
+
+- Confirm Vite dev server is running
+- Check if port 5173 is available
+- Verify React Router configuration
+
+**File upload issues:**
+
+- Check if `upload/images/` directory exists in backend
+- Verify Multer configuration
+- Ensure proper file permissions
+
+### Port Conflicts
+
+If default ports are in use, you can change them:
+
+- Backend: Modify `PORT` in `.env` file
+- Frontend: Set `PORT=3001` in environment or use `npm start -- --port 3001`
+- Admin: Use `npm run dev -- --port 5174`
 
 ## 🤝 Contributing
 
