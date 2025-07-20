@@ -8,6 +8,7 @@ import connectDatabase from "./config/db.js";
 import AuthRoutes from "./routes/AuthRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import UploadRoutes from "./routes/UploadRoutes.js";
+import { globalLimiter } from "./middleware/rateLimiter.js";
 
 dotenv.config();
 
@@ -34,6 +35,8 @@ app.use("/images", express.static("upload/images"));
 app.use("/api/auth", AuthRoutes);
 app.use("/api/products", ProductRoutes);
 app.use("/api/upload", UploadRoutes);
+
+app.use(globalLimiter);
 
 app.listen(PORT, (error) => {
   if (!error) {
