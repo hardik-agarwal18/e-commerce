@@ -1,15 +1,36 @@
 import React from "react";
 import "./Popular.css";
-import data_product from "../../Assets/data";
 import Item from "../Item/Item";
+import { useState } from "react";
+import { useEffect } from "react";
+import { axiosInstance } from "../../lib/axios";
 
 const Popular = () => {
+  const [popularProducts, setPopularProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchNewCollections = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/api/products/popularinwomen"
+        );
+        if (response.data && response.data.popularinwomen) {
+          setPopularProducts(response.data.popularinwomen);
+        }
+      } catch (error) {
+        console.error("Error fetching new collections:", error);
+      }
+    };
+
+    fetchNewCollections();
+  }, []);
+
   return (
     <div className="popular">
       <h1>POPULAR IN WOMEN</h1>
       <hr />
       <div className="popular-item">
-        {data_product.map((item, i) => {
+        {popularProducts.map((item, i) => {
           return (
             <Item
               key={i}

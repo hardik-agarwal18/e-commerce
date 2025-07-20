@@ -54,3 +54,13 @@ export const newCollection = async (req, res) => {
     return res.status(200).json({ newcollection });
   }
 };
+
+export const popularInWomen = async (req, res) => {
+  const products = await Product.find({ category: "women" });
+  let popularinwomen = products.slice(1).slice(-4);
+  if (popularinwomen) {
+    return res.status(200).json({ popularinwomen });
+  }
+};
+
+export const addToCart = async (req, res) => {};

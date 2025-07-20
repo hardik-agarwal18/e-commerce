@@ -1,9 +1,11 @@
 import express from "express";
 import {
   addProduct,
+  addToCart,
   deleteProduct,
   getAllProducts,
   newCollection,
+  popularInWomen,
 } from "../controllers/ProductController.js";
 
 const router = express.Router();
@@ -16,5 +18,7 @@ router.get("/getallproducts", getAllProducts);
 router.post("/removeproduct", deleteProduct);
 // Creating endpoint for new collection
 router.get("/newcollection", newCollection);
-
+// Creating endpoint for popular in women
+router.get("/popularinwomen", popularInWomen);
+router.post("/addtocart", addToCart);
 export default router;
