@@ -4,6 +4,7 @@ import {
   addToCart,
   deleteProduct,
   getAllProducts,
+  getCart,
   newCollection,
   popularInWomen,
   removeFromCart,
@@ -24,8 +25,9 @@ router.get("/newcollection", newCollection);
 // Creating endpoint for popular in women
 router.get("/popularinwomen", popularInWomen);
 
+// Cart routes with authentication
 router.post("/addtocart", authenticateToken, addToCart);
 router.post("/removefromcart", authenticateToken, removeFromCart);
-router.post("/getcart", authenticateToken);
+router.get("/getcart", authenticateToken, getCart);
 
 export default router;

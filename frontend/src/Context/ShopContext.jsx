@@ -1,23 +1,58 @@
-import React, { createContext, useState } from "react";
-import all_product from "../Assets/all_product";
+import React, { createContext, useState, useEffect } from "react";
 import { axiosInstance } from "../lib/axios";
 
 export const ShopContext = createContext(null);
+
 //Default value for cart
 const getDefaultCart = () => {
   let cart = {};
-  for (let index = 0; index < all_product.length + 1; index++) {
-    cart[index] = 0;
-  }
+  // Initialize with empty cart - will be populated as needed
   return cart;
 };
 
 const ShopContextProvider = (props) => {
+  const [all_product, setAllProduct] = useState([]);
   const [cartItems, setCartItems] = useState(getDefaultCart());
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "/api/products/getallproducts"
+        );
+        setAllProduct(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    const fetchCartData = async () => {
+      if (localStorage.getItem("auth-token")) {
+        try {
+          const response = await axiosInstance.get("/api/products/getcart", {
+            headers: {
+              "auth-token": localStorage.getItem("auth-token"),
+            },
+          });
+          if (response.data.success) {
+            setCartItems(response.data.cartData);
+          }
+        } catch (error) {
+          console.error("Error fetching cart data:", error);
+        }
+      }
+    };
+
+    fetchProducts();
+    fetchCartData();
+  }, []);
+
   const addToCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
-    console.log(cartItems);
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: (prev[itemId] || 0) + 1,
+    }));
+
     if (localStorage.getItem("auth-token")) {
       try {
         const response = await axiosInstance.post(
@@ -41,7 +76,11 @@ const ShopContextProvider = (props) => {
   };
 
   const removeFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: Math.max((prev[itemId] || 0) - 1, 0),
+    }));
+
     if (localStorage.getItem("auth-token")) {
       try {
         const response = await axiosInstance.post(
@@ -87,6 +126,23 @@ const ShopContextProvider = (props) => {
     return totalItems;
   };
 
+  const refreshCart = async () => {
+    if (localStorage.getItem("auth-token")) {
+      try {
+        const response = await axiosInstance.get("/api/products/getcart", {
+          headers: {
+            "auth-token": localStorage.getItem("auth-token"),
+          },
+        });
+        if (response.data.success) {
+          setCartItems(response.data.cartData);
+        }
+      } catch (error) {
+        console.error("Error refreshing cart:", error);
+      }
+    }
+  };
+
   const contextValue = {
     getTotalCartItems, // Added this function to get total number of items in cart
     getTotalcartAmount, // Added this function to get Total Price
@@ -94,6 +150,7 @@ const ShopContextProvider = (props) => {
     cartItems,
     addToCart,
     removeFromCart,
+    refreshCart, // Added function to refresh cart data
   };
   return (
     <ShopContext.Provider value={contextValue}>
