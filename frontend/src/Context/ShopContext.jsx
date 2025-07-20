@@ -1,5 +1,6 @@
 import React, { createContext, useState } from "react";
 import all_product from "../Assets/all_product";
+import { axiosInstance } from "../lib/axios";
 
 export const ShopContext = createContext(null);
 //Default value for cart
@@ -14,13 +15,53 @@ const getDefaultCart = () => {
 const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState(getDefaultCart());
 
-  const addToCart = (itemId) => {
+  const addToCart = async (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }));
     console.log(cartItems);
+    if (localStorage.getItem("auth-token")) {
+      try {
+        const response = await axiosInstance.post(
+          "/api/products/addtocart",
+          {
+            itemId: itemId,
+          },
+          {
+            headers: {
+              "auth-token": localStorage.getItem("auth-token"),
+            },
+          }
+        );
+        if (response.data.success) {
+          console.log("Product added to cart successfully");
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      }
+    }
   };
 
-  const removeFromCart = (itemId) => {
+  const removeFromCart = async (itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    if (localStorage.getItem("auth-token")) {
+      try {
+        const response = await axiosInstance.post(
+          "/api/products/removefromcart",
+          {
+            itemId: itemId,
+          },
+          {
+            headers: {
+              "auth-token": localStorage.getItem("auth-token"),
+            },
+          }
+        );
+        if (response.data.success) {
+          console.log("Product removed from cart successfully");
+        }
+      } catch (error) {
+        console.error("Error removing from cart:", error);
+      }
+    }
   };
 
   const getTotalcartAmount = () => {
@@ -28,7 +69,7 @@ const ShopContextProvider = (props) => {
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
         let itemInfo = all_product.find((product) => {
-          product.id === Number(item);
+          return product.id === Number(item);
         });
         if (itemInfo) totalAmount += itemInfo.new_price * cartItems[item];
       }

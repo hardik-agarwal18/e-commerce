@@ -6,7 +6,10 @@ import {
   getAllProducts,
   newCollection,
   popularInWomen,
+  removeFromCart,
 } from "../controllers/ProductController.js";
+
+import { authenticateToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -20,5 +23,9 @@ router.post("/removeproduct", deleteProduct);
 router.get("/newcollection", newCollection);
 // Creating endpoint for popular in women
 router.get("/popularinwomen", popularInWomen);
-router.post("/addtocart", addToCart);
+
+router.post("/addtocart", authenticateToken, addToCart);
+router.post("/removefromcart", authenticateToken, removeFromCart);
+router.post("/getcart", authenticateToken);
+
 export default router;

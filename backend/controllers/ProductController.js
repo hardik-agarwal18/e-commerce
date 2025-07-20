@@ -1,4 +1,5 @@
 import Product from "../models/ProductModel.js";
+import Users from "../models/UserModel.js";
 
 export const addProduct = async (req, res) => {
   const { name, image, category, new_price, old_price } = req.body;
@@ -30,7 +31,7 @@ export const addProduct = async (req, res) => {
   });
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (r, q, res) => {
   const { id } = req.body;
   const product = await Product.findOneAndDelete({ id });
   console.log("Removed the Product");
@@ -63,4 +64,30 @@ export const popularInWomen = async (req, res) => {
   }
 };
 
-export const addToCart = async (req, res) => {};
+export const addToCart = async (req, res) => {
+  const userData = await Users.findOne({ _id: req.user.id });
+  userData.cartData[req.body.itemId] += 1;
+  const user = await Users.findOneAndUpdate(
+    { _id: req.user.id },
+    { cartData: userData.cartData }
+  );
+  await user.save();
+  return res.status(203).json({ message: "Added items in the cart" });
+};
+
+export const removeFromCart = async (req, res) => {
+  const userData = await Users.findOne({ _id: req.user.id });
+  if (userData.cartData[req.body.itemId] > 0)
+    userData.cartData[req.body.itemId] -= 1;
+  const user = await Users.findOneAndUpdate(
+    { _id: req.user.id },
+    { cartData: userData.cartData }
+  );
+  await user.save();
+  return res.status(203).json({ message: "Removed items from the cart" });
+};
+
+export const getCart = async (req, res) => {
+  const userData = await Users.findOne({ _id: req.user.id });
+  res.json(userData.cartData);
+};
