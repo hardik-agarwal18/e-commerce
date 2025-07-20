@@ -45,3 +45,12 @@ export const getAllProducts = async (req, res) => {
   console.log("All Products Fetched");
   res.send(products);
 };
+
+export const newCollection = async (req, res) => {
+  let products = await Product.find({});
+
+  let newcollection = products.slice(1).slice(-8);
+  if (newcollection) {
+    return res.status(200).json({ newcollection });
+  }
+};

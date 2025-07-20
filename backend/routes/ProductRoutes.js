@@ -3,6 +3,7 @@ import {
   addProduct,
   deleteProduct,
   getAllProducts,
+  newCollection,
 } from "../controllers/ProductController.js";
 
 const router = express.Router();
@@ -13,5 +14,7 @@ router.post("/addproduct", addProduct);
 router.get("/getallproducts", getAllProducts);
 //Get All Products
 router.post("/removeproduct", deleteProduct);
+// Creating endpoint for new collection
+router.get("/newcollection", newCollection);
 
 export default router;
