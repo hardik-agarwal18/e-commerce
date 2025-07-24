@@ -5,7 +5,6 @@ import {
   deleteProduct,
   getAllProducts,
   getCart,
-  getProductsCount,
   newCollection,
   popularInWomen,
   removeFromCart,
@@ -20,8 +19,6 @@ const router = express.Router();
 router.post("/addproduct", authenticateToken, admin, addProduct);
 //Get All Products
 router.get("/getallproducts", getAllProducts);
-//Get All Products Count
-router.get("/getallproducts/count", getProductsCount);
 //Remove Product
 router.post("/removeproduct", authenticateToken, admin, deleteProduct);
 // Creating endpoint for new collection

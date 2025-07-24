@@ -10,9 +10,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProductCount = async () => {
       try {
-        const response = await axiosInstance.get(
-          "/products/getallproducts/count"
-        );
+        const response = await axiosInstance.get("/analytics/product-count");
         setProductCount(response.data.count);
       } catch (error) {
         console.error("Error fetching total products:", error);
@@ -21,7 +19,7 @@ const Dashboard = () => {
 
     const fetchUserCount = async () => {
       try {
-        const response = await axiosInstance.get("/auth/admin/usercount");
+        const response = await axiosInstance.get("/analytics/user-count");
         setUserCount(response.data.count);
       } catch (error) {
         console.error("Error fetching total users:", error);

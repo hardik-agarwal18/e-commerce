@@ -1,5 +1,5 @@
-import Product from "../models/ProductModel";
-import Users from "../models/UserModel";
+import Product from "../models/ProductModel.js";
+import Users from "../models/UserModel.js";
 
 export const userCount = async (req, res) => {
   try {

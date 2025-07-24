@@ -2,14 +2,17 @@ import "./Navbar.css";
 import navlogo from "../../assets/nav-logo.svg";
 // import navProfile from "../../assets/nav-profile.svg";
 import { Link, useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../lib/axios";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const loggedIn = localStorage.getItem("auth-token");
 
   const handleLogout = () => {
-    localStorage.removeItem("auth-token");
-    navigate("/login");
+    axiosInstance.post("/admin/logout").then(() => {
+      localStorage.removeItem("auth-token");
+      navigate("/login");
+    });
   };
 
   return (
