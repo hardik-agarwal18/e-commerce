@@ -4,6 +4,7 @@ import {
   logout,
   signup,
   authLogin,
+  userCount,
 } from "../controllers/AuthControllers.js";
 import { loginLimiter, signupLimiter } from "../middleware/rateLimiter.js";
 
@@ -17,5 +18,7 @@ router.post("/login", loginLimiter, login);
 router.post("/logout", logout);
 
 router.post("/admin/login", authLogin);
+
+router.get("/admin/usercount", userCount);
 
 export default router;

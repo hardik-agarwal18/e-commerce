@@ -100,3 +100,13 @@ export const authLogin = async (req, res) => {
     res.status(400).json({ success: false, errors: "Invalid Credentials" });
   }
 };
+
+export const userCount = async (req, res) => {
+  try {
+    const count = await Users.countDocuments();
+    res.status(200).json({ success: true, count });
+  } catch (error) {
+    console.error("Error fetching user count:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
