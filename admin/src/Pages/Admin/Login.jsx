@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./css/Login.css";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../../lib/axios";
 
 export const Login = () => {
   const [formData, setFormData] = useState({
