@@ -1,6 +1,6 @@
 import "./Navbar.css";
 import navlogo from "../../assets/nav-logo.svg";
-import navProfile from "../../assets/nav-profile.svg";
+// import navProfile from "../../assets/nav-profile.svg";
 import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
@@ -22,7 +22,11 @@ const Navbar = () => {
           Logout
         </button>
       ) : (
-        <img src={navProfile} alt="" className="nav-profile" />
+        <>
+          <Link to="/login" className="nav-login-btn">
+            <button className="nav-login-btn">Login</button>
+          </Link>
+        </>
       )}
     </div>
   );
