@@ -12,17 +12,18 @@ import {
 } from "../controllers/ProductController.js";
 
 import { authenticateToken } from "../middleware/auth.js";
+import admin from "../middleware/admin.js";
 
 const router = express.Router();
 
 //Add Product
-router.post("/addproduct", addProduct);
+router.post("/addproduct", authenticateToken, admin, addProduct);
 //Get All Products
 router.get("/getallproducts", getAllProducts);
 //Get All Products Count
 router.get("/getallproducts/count", getProductsCount);
 //Remove Product
-router.post("/removeproduct", deleteProduct);
+router.post("/removeproduct", authenticateToken, admin, deleteProduct);
 // Creating endpoint for new collection
 router.get("/newcollection", newCollection);
 // Creating endpoint for popular in women

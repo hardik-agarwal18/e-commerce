@@ -55,15 +55,11 @@ export const deleteProduct = async (req, res) => {
     });
   }
 };
+
 export const getAllProducts = async (req, res) => {
   let products = await Product.find({});
   console.log("All Products Fetched");
   res.send(products);
-};
-export const getProductsCount = async (req, res) => {
-  let products = await Product.find({});
-  console.log("All Products Fetched");
-  res.send({ count: products.length });
 };
 
 export const newCollection = async (req, res) => {
