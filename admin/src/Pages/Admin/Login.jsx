@@ -16,7 +16,7 @@ export const Login = () => {
     console.log("Login Function", formData);
 
     try {
-      const response = await axiosInstance.post("/api/auth/admin/login", {
+      const response = await axiosInstance.post("/auth/admin/login", {
         email: formData.email,
         password: formData.password,
       });

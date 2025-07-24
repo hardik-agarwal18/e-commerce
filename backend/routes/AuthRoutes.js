@@ -16,6 +16,6 @@ router.post("/login", loginLimiter, login);
 //Logout
 router.post("/logout", logout);
 
-router.post("/auth/login", authLogin);
+router.post("/admin/login", authLogin);
 
 export default router;
