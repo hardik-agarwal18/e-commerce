@@ -33,10 +33,11 @@ const Navbar = () => {
   };
   return (
     <div className="navbar">
-      <div className="nav-logo">
+      <Link className="nav-logo" to="/">
         <img src={logo} alt="Logo" />
-        <p>SHOPPER</p>
-      </div>
+        <p className="shopper">SHOPPER</p>
+      </Link>
+
       <img
         className="nav-dropdown"
         src={nav_dropdown}

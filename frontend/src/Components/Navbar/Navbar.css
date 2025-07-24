@@ -5,11 +5,18 @@
   box-shadow: 0 1px 3px -2px black;
   align-items: center;
 }
+.shopper {
+  color: #171717;
+  font-size: 32px;
+  font-weight: 600;
+  text-decoration: none;
+}
 
 .nav-logo {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
 }
 .nav-logo p {
   color: #171717;
