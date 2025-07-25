@@ -7,6 +7,12 @@ import {
   popularInWomen,
 } from "../controllers/ProductController.js";
 
+import {
+  addtowishlist,
+  removefromwishlist,
+  wishlistItems,
+} from "../controllers/WishlistController.js";
+
 import { isSignedIn } from "../middleware/auth.js";
 import isAdmin from "../middleware/admin.js";
 
@@ -22,5 +28,10 @@ router.post("/removeproduct", isSignedIn, isAdmin, deleteProduct);
 router.get("/newcollection", newCollection);
 // Creating endpoint for popular in women
 router.get("/popularinwomen", popularInWomen);
+
+//Wishlist
+router.post("/addtowishlist", isSignedIn, addtowishlist);
+router.post("/removefromwishlist", isSignedIn, removefromwishlist);
+router.get("/wishlistitems", isSignedIn, wishlistItems);
 
 export default router;

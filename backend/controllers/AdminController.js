@@ -22,5 +22,5 @@ export const adminLogin = async (req, res) => {
 
 export const adminLogout = async (req, res) => {
   res.clearCookie("token");
-  res.json({ success: true, message: "User logged out successfully" });
+  res.json({ success: true, message: "Admin logged out successfully" });
 };
