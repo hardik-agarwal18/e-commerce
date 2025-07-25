@@ -3,13 +3,13 @@ import {
   getProductsCount,
   userCount,
 } from "../controllers/AnalyticsController.js";
-import { authenticateToken } from "../middleware/auth.js";
-import admin from "../middleware/admin.js";
+import { isSignedIn } from "../middleware/auth.js";
+import isAdmin from "../middleware/admin.js";
 
 const router = express.Router();
 
-router.get("/user-count", authenticateToken, admin, userCount);
+router.get("/user-count", isSignedIn, isAdmin, userCount);
 
-router.get("/product-count", authenticateToken, admin, getProductsCount);
+router.get("/product-count", isSignedIn, isAdmin, getProductsCount);
 
 export default router;

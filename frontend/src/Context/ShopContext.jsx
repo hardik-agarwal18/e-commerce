@@ -29,7 +29,7 @@ const ShopContextProvider = (props) => {
     const fetchCartData = async () => {
       if (localStorage.getItem("auth-token")) {
         try {
-          const response = await axiosInstance.get("/api/products/getcart", {
+          const response = await axiosInstance.get("/api/cart/getcart", {
             headers: {
               "auth-token": localStorage.getItem("auth-token"),
             },
@@ -56,7 +56,7 @@ const ShopContextProvider = (props) => {
     if (localStorage.getItem("auth-token")) {
       try {
         const response = await axiosInstance.post(
-          "/api/products/addtocart",
+          "/api/cart/addtocart",
           {
             itemId: itemId,
           },
@@ -84,7 +84,7 @@ const ShopContextProvider = (props) => {
     if (localStorage.getItem("auth-token")) {
       try {
         const response = await axiosInstance.post(
-          "/api/products/removefromcart",
+          "/api/cart/removefromcart",
           {
             itemId: itemId,
           },
@@ -129,7 +129,7 @@ const ShopContextProvider = (props) => {
   const refreshCart = async () => {
     if (localStorage.getItem("auth-token")) {
       try {
-        const response = await axiosInstance.get("/api/products/getcart", {
+        const response = await axiosInstance.get("/api/cart/getcart", {
           headers: {
             "auth-token": localStorage.getItem("auth-token"),
           },

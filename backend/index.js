@@ -8,6 +8,7 @@ import ProductRoutes from "./routes/ProductRoutes.js";
 import UploadRoutes from "./routes/UploadRoutes.js";
 import AdminRoutes from "./routes/AdminRoutes.js";
 import AnalyticsRoutes from "./routes/AnalyticsRoutes.js";
+import CartRoutes from "./routes/CartRoutes.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use("/api/products", ProductRoutes);
 app.use("/api/upload", UploadRoutes);
 app.use("/api/admin", AdminRoutes);
 app.use("/api/analytics", AnalyticsRoutes);
+app.use("/api/cart", CartRoutes);
 
 app.use(globalLimiter);
 
