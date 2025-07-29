@@ -56,3 +56,33 @@ export const addAddress = async (req, res) => {
     });
   }
 };
+
+export const removeAddress = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const address = await Address.findById(id);
+    if (!address) {
+      return res.status(404).json({
+        success: false,
+        message: "Address not found",
+      });
+    }
+    if (address.userId.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this address",
+      });
+    }
+    await Address.findByIdAndDelete(id);
+    res
+      .status(200)
+      .json({ success: true, message: "Address removed successfully" });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error removing address",
+      error: error.message,
+    });
+  }
+};
