@@ -9,7 +9,7 @@ export const adminLogin = async (req, res) => {
   if (email === adminEmail && password === adminPassword) {
     const data = {
       user: {
-        id: "admin_user", // A unique identifier for the admin
+        id: "admin_user",
         role: "admin",
       },
     };

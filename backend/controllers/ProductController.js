@@ -1,7 +1,7 @@
 import Product from "../models/ProductModel.js";
 
 export const addProduct = async (req, res) => {
-  const { name, image, category, new_price, old_price } = req.body;
+  const { name, image, category, new_price, old_price, stock } = req.body;
 
   let products = await Product.find({});
   let id;
@@ -18,6 +18,8 @@ export const addProduct = async (req, res) => {
     category: category,
     new_price: new_price,
     old_price: old_price,
+    stock: stock,
+    available: stock > 0,
   });
   console.log(product);
 
