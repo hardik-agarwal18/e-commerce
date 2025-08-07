@@ -29,7 +29,7 @@ const Product = mongoose.model("Product", {
     type: Date,
     default: Date.now,
   },
-  stock: { tupe: Number, required: true, default: 0 },
+  stock: { type: Number, required: true, default: 0 },
   available: {
     type: Boolean,
     default: true,
