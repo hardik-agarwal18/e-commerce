@@ -57,6 +57,26 @@ export const addAddress = async (req, res) => {
   }
 };
 
+export const getAddresses = async (req, res) => {
+  try {
+    const addresses = await Address.find({ userId: req.user.id }).sort({
+      isDefault: -1,
+      createdAt: -1,
+    });
+
+    res.status(200).json({
+      success: true,
+      addresses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching addresses",
+      error: error.message,
+    });
+  }
+};
+
 export const removeAddress = async (req, res) => {
   const { id } = req.params;
 

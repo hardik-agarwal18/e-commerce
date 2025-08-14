@@ -1,7 +1,11 @@
 import express from "express";
 
 import { isSignedIn } from "../middleware/auth.js";
-import { addAddress, removeAddress } from "../controllers/AddressController.js";
+import {
+  addAddress,
+  removeAddress,
+  getAddresses,
+} from "../controllers/AddressController.js";
 
 import {
   addtowishlist,
@@ -12,6 +16,7 @@ import {
 const router = express.Router();
 
 //Address
+router.get("/addresses", isSignedIn, getAddresses);
 router.post("/add-address", isSignedIn, addAddress);
 router.delete("/remove-address/:id", isSignedIn, removeAddress);
 
