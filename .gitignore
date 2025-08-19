@@ -7,3 +7,7 @@ admin/node_modules/
 *.log
 .env
 /backend/.env
+
+/backend/scripts
+/backend/uml-diagrams
+/backend/schemas
