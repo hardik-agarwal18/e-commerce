@@ -22,7 +22,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://e-commerce-1l6z.vercel.app",
+      "https://ecommerce.hardik-agarwa18.xyz",
+      "https://admin-ecommerce.hardik-agarwal18.xyz",
+    ],
     credentials: true,
   })
 );
