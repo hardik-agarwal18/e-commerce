@@ -36,7 +36,8 @@ app.get("/", (req, res) => {
   res.send("Express App is Running");
 });
 
-app.use("/images", express.static("upload/images"));
+// Static file serving - kept active for backward compatibility with existing images
+// app.use("/images", express.static("upload/images"));
 
 app.use("/api/auth", AuthRoutes);
 app.use("/api/products", ProductRoutes);
