@@ -11,3 +11,5 @@ admin/node_modules/
 /backend/scripts
 /backend/uml-diagrams
 /backend/schemas
+
+/docs
