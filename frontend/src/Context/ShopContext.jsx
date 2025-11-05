@@ -13,16 +13,20 @@ const getDefaultCart = () => {
 const ShopContextProvider = (props) => {
   const [all_product, setAllProduct] = useState([]);
   const [cartItems, setCartItems] = useState(getDefaultCart());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const response = await axiosInstance.get(
           "/api/products/getallproducts"
         );
         setAllProduct(response.data);
       } catch (error) {
         console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -151,6 +155,7 @@ const ShopContextProvider = (props) => {
     addToCart,
     removeFromCart,
     refreshCart, // Added function to refresh cart data
+    loading, // Added loading state
   };
   return (
     <ShopContext.Provider value={contextValue}>
