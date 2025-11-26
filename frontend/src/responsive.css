@@ -1,0 +1,147 @@
+/* Global Responsive Utilities */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mobile-friendly scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Touch-friendly buttons and links for mobile */
+@media (max-width: 800px) {
+  button,
+  a {
+    min-height: 44px;
+  }
+
+  /* Better tap targets */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+}
+
+/* Responsive container utilities */
+.container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+/* Responsive text utilities */
+.text-responsive {
+  font-size: clamp(14px, 2vw, 18px);
+}
+
+.heading-responsive {
+  font-size: clamp(24px, 4vw, 48px);
+}
+
+/* Hide/Show utilities for different screen sizes */
+@media (max-width: 500px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 501px) and (max-width: 800px) {
+  .hide-tablet {
+    display: none !important;
+  }
+}
+
+@media (min-width: 801px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* Responsive spacing utilities */
+@media (max-width: 500px) {
+  .p-responsive {
+    padding: 10px !important;
+  }
+
+  .m-responsive {
+    margin: 10px !important;
+  }
+}
+
+@media (min-width: 501px) and (max-width: 800px) {
+  .p-responsive {
+    padding: 20px !important;
+  }
+
+  .m-responsive {
+    margin: 20px !important;
+  }
+}
+
+@media (min-width: 801px) {
+  .p-responsive {
+    padding: 30px !important;
+  }
+
+  .m-responsive {
+    margin: 30px !important;
+  }
+}
