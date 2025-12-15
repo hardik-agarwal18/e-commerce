@@ -68,10 +68,4 @@ app.use("/api/user", UserRoutes);
 
 app.use(globalLimiter);
 
-app.listen(PORT, (error) => {
-  if (!error) {
-    console.log("Server Running on Port " + PORT);
-  } else {
-    console.log("Error in the Server:" + error);
-  }
-});
+export default app;
