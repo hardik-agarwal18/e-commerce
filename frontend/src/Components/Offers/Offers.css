@@ -1,11 +1,12 @@
 .offers {
-  width: 65%;
-  height: 60vh;
+  max-width: 1400px;
+  min-height: 500px;
   display: flex;
-  margin: auto;
-  padding: 0px 140px;
-  margin-bottom: 150px;
-  background: linear-gradient(180deg, #fde1ff 0%, #e1ffea22 60%);
+  margin: 80px auto 150px;
+  padding: 80px 100px;
+  background: linear-gradient(135deg, #fde1ff 0%, #e1ffea22 100%);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-md);
 }
 
 .offers-left {
@@ -13,33 +14,49 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* gap: 20px;
-    padding-left: 180px; */
+  gap: 24px;
+  padding-right: 60px;
 }
 
 .offers-left h1 {
-  color: #171717;
-  font-size: 80px;
-  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 72px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1px;
 }
 
 .offers-left p {
-  color: #171717;
-  font-size: 22px;
-  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 .offers-left button {
-  width: 282px;
+  width: 280px;
   height: 70px;
-  border-radius: 35px;
-  background: #ff4141;
+  border-radius: 50px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-dark) 100%
+  );
   border: none;
-  color: white;
-  font-size: 22px;
-  font-weight: 500;
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 700;
   margin-top: 30px;
   cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 8px 24px rgba(255, 65, 65, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.offers-left button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 65, 65, 0.4);
 }
 
 .offers-right {

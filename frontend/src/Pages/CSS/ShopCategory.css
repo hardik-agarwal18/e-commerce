@@ -1,45 +1,84 @@
 .shopcategory-banner {
   display: block;
-  width: 82%;
-  margin: 30px auto;
+  width: 100%;
+  max-width: 1400px;
+  margin: 40px auto;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .shopcategory-indexsort {
   display: flex;
-  margin: 0 170px;
+  margin: 40px auto;
+  max-width: 1600px;
+  padding: 0 80px;
   justify-content: space-between;
   align-items: center;
 }
 
 .shopcategory-sort {
-  padding: 10px 20px;
-  border-radius: 40px;
-  border: 1px solid #888;
+  padding: 12px 28px;
+  border-radius: 50px;
+  border: 2px solid var(--border-color);
+  background: var(--white);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-weight: 500;
+}
+
+.shopcategory-sort:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.shopcategory-indexsort p {
+  color: var(--text-secondary);
+  font-size: 16px;
 }
 
 .shopcategory-indexsort p span {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .shopcategory-products {
-  margin: 20px 170px;
+  margin: 60px auto;
+  max-width: 1600px;
+  padding: 0 60px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  row-gap: 80px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 50px;
+  justify-items: center;
 }
 
 .shopcategory-loadmore {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 150px auto;
-  width: 233px;
-  height: 69px;
-  border-radius: 75px;
-  background: #ededed;
-  color: #787878;
-  font-size: 18px;
-  font-weight: 500;
+  margin: 120px auto;
+  padding: 0 40px;
+  min-width: 240px;
+  height: 64px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--bg-light), #e0e0e0);
+  color: var(--text-secondary);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.shopcategory-loadmore:hover {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--primary-dark)
+  );
+  color: var(--white);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Responsive Design */

@@ -88,10 +88,14 @@ const Navbar = () => {
       </ul>
       <div className="nav-login-cart">
         {localStorage.getItem("auth-token") ? (
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout}>
+            <span>Logout</span>
+          </button>
         ) : (
           <Link to="/login">
-            <button>Login</button>
+            <button>
+              <span>Login</span>
+            </button>
           </Link>
         )}
         <Link to="/cart">
