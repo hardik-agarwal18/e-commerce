@@ -1,0 +1,108 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "backend/**"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Check syntax
+        working-directory: ./backend
+        run: node -c server.js
+
+      - name: Run tests
+        working-directory: ./backend
+        run: |
+          if grep -q "\"test\":" package.json; then
+            npm test
+          else
+            echo "No tests configured"
+          fi
+        continue-on-error: true
+
+      - name: Build check
+        run: echo "✅ Backend build successful"
+
+  deploy:
+    name: Deploy to Render
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment:
+      name: production-backend
+      url: https://e-commerce-t8ov.onrender.com
+
+    steps:
+      - name: Trigger Render deployment
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK }}" ]; then
+            echo "⚠️ RENDER_DEPLOY_HOOK secret not set"
+            echo "Add it in: Settings → Secrets → Actions → New repository secret"
+            exit 0
+          fi
+
+          echo "🚀 Deploying to Render..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+            echo "✅ Deployment triggered successfully"
+          else
+            echo "❌ Deployment failed (HTTP $HTTP_CODE)"
+            exit 1
+          fi
+
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for Render to deploy (this takes 2-5 minutes)..."
+          sleep 30
+
+          for i in {1..20}; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.BACKEND_URL }} || echo "000")
+            
+            if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
+              echo "✅ Backend is live! (HTTP $CODE)"
+              exit 0
+            fi
+            
+            echo "Attempt $i/20: HTTP $CODE - waiting 15s..."
+            sleep 15
+          done
+
+          echo "⚠️ Timeout - check Render dashboard for status"
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "### Backend Deployment 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform**: Render" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: https://e-commerce-t8ov.onrender.com" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY

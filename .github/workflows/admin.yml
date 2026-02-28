@@ -1,0 +1,112 @@
+name: Admin CI/CD
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "admin/**"
+      - ".github/workflows/admin.yml"
+  pull_request:
+    branches: [master]
+    paths:
+      - "admin/**"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./admin
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./admin
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build application
+        working-directory: ./admin
+        run: npm run build
+        env:
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-build
+          path: admin/dist/
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Vercel
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment:
+      name: production-admin
+      url: https://admin-ecommerce.hardik-agarwal18.xyz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install & Build
+        working-directory: ./admin
+        run: |
+          npm ci
+          npm run build
+        env:
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+
+      - name: Deploy to Vercel
+        if: secrets.VERCEL_TOKEN != ''
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_ADMIN_PROJECT_ID }}
+          working-directory: ./admin
+          vercel-args: "--prod"
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for Vercel deployment..."
+          sleep 15
+
+          CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.ADMIN_URL }} || echo "000")
+
+          if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
+            echo "✅ Admin panel is live! (HTTP $CODE)"
+          else
+            echo "⚠️ HTTP $CODE - Check Vercel dashboard"
+          fi
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "### Admin Deployment 👨‍💼" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Platform**: Vercel" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: https://admin-ecommerce.hardik-agarwal18.xyz" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY

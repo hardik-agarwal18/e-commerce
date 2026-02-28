@@ -1,0 +1,56 @@
+name: Health Check
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # Every 6 hours
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types: [completed]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check All Services
+        run: |
+          echo "🔍 Checking deployment health..."
+          echo ""
+
+          # Backend
+          BACKEND_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.BACKEND_URL }} || echo "000")
+          BACKEND_TIME=$(curl -o /dev/null -s -w '%{time_total}' ${{ secrets.BACKEND_URL }} || echo "0")
+
+          # Frontend
+          FRONTEND_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.FRONTEND_URL }} || echo "000")
+          FRONTEND_TIME=$(curl -o /dev/null -s -w '%{time_total}' ${{ secrets.FRONTEND_URL }} || echo "0")
+
+          # Admin
+          ADMIN_CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.ADMIN_URL }} || echo "000")
+          ADMIN_TIME=$(curl -o /dev/null -s -w '%{time_total}' ${{ secrets.ADMIN_URL }} || echo "0")
+
+          # Report
+          echo "================================================"
+          echo "           HEALTH CHECK RESULTS"
+          echo "================================================"
+          echo ""
+          echo "🔧 Backend:   HTTP $BACKEND_CODE  (${BACKEND_TIME}s)"
+          echo "🌐 Frontend:  HTTP $FRONTEND_CODE  (${FRONTEND_TIME}s)"
+          echo "👨‍💼 Admin:     HTTP $ADMIN_CODE  (${ADMIN_TIME}s)"
+          echo ""
+          echo "Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          echo "================================================"
+
+          # Check for failures
+          FAILED=0
+          [ "$BACKEND_CODE" -lt 200 ] || [ "$BACKEND_CODE" -ge 400 ] && FAILED=1
+          [ "$FRONTEND_CODE" -lt 200 ] || [ "$FRONTEND_CODE" -ge 400 ] && FAILED=1
+          [ "$ADMIN_CODE" -lt 200 ] || [ "$ADMIN_CODE" -ge 400 ] && FAILED=1
+
+          if [ $FAILED -eq 1 ]; then
+            echo "❌ Some services are down!"
+            exit 1
+          else
+            echo "✅ All services are healthy!"
+          fi
