@@ -99,9 +99,9 @@ jobs:
           CODE=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.FRONTEND_URL }} || echo "000")
 
           if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
-            echo "✅ Frontend is live! (HTTP $CODE)"
+            echo "Frontend is live! (HTTP $CODE)"
           else
-            echo "⚠️ HTTP $CODE - Check Vercel dashboard"
+            echo "HTTP $CODE - Check Vercel dashboard"
           fi
 
       - name: Deployment summary
