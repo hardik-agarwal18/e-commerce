@@ -11,7 +11,7 @@ export const addtowishlist = async (req, res) => {
 
     // Check if the product is already in the wishlist
     const productIndex = wishlist.products.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId.toString() === productId,
     );
 
     if (productIndex === -1) {
@@ -39,7 +39,7 @@ export const removefromwishlist = async (req, res) => {
 
     // Remove the product from the wishlist
     wishlist.products = wishlist.products.filter(
-      (item) => item.productId.toString() !== productId
+      (item) => item.productId.toString() !== productId,
     );
 
     await wishlist.save();
@@ -55,7 +55,7 @@ export const wishlistItems = async (req, res) => {
 
   try {
     const wishlist = await WishList.findOne({ userId }).populate(
-      "products.productId"
+      "products.productId",
     );
     if (!wishlist) {
       return res.status(404).json({ message: "Wishlist not found" });
