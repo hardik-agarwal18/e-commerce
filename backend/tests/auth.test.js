@@ -10,7 +10,7 @@ describe("Auth API", () => {
 
   it("should register user", async () => {
     const res = await request(app).post("/api/auth/signup").send({
-      username: "testuser",
+      name: "testuser",
       email: "test@mail.com",
       password: "123456",
     });
@@ -19,7 +19,7 @@ describe("Auth API", () => {
 
   it("should not register user with existing email", async () => {
     const res = await request(app).post("/api/auth/signup").send({
-      username: "testuser2",
+      name: "testuser2",
       email: "test@mail.com",
       password: "1234567",
     });
@@ -48,5 +48,13 @@ describe("Auth API", () => {
       .send({ email: "nonexistent@mail.com", password: "123456" });
 
     expect(res.statusCode).toBe(401);
+  });
+
+  it("should logout user", async () => {
+    const res = await request(app).post("/api/auth/logout");
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toBe("User logged out successfully");
   });
 });
