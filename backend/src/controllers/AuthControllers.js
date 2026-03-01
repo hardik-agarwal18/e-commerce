@@ -74,10 +74,12 @@ export const login = async (req, res) => {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   });
 
-  res.json({ success: true, token, message: "User Logged in" });
+  res.status(200).json({ success: true, token, message: "User Logged in" });
 };
 
 export const logout = async (req, res) => {
   res.clearCookie("token");
-  res.json({ success: true, message: "User logged out successfully" });
+  res
+    .status(200)
+    .json({ success: true, message: "User logged out successfully" });
 };
