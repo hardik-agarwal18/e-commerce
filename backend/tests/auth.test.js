@@ -9,7 +9,7 @@ describe("Auth API", () => {
   });
 
   it("should register user", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/api/auth/signup").send({
       username: "testuser",
       email: "test@mail.com",
       password: "123456",
@@ -18,7 +18,7 @@ describe("Auth API", () => {
   });
 
   it("should not register user with existing email", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/api/auth/signup").send({
       username: "testuser2",
       email: "test@mail.com",
       password: "1234567",
