@@ -44,7 +44,7 @@ export const signup = async (req, res) => {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   });
 
-  res.status(200).json({
+  res.status(201).json({
     success: true,
     token,
     message: "User Created",
@@ -55,12 +55,12 @@ export const login = async (req, res) => {
 
   let user = await Users.findOne({ email });
   if (!user) {
-    return res.status(400).json({ success: false, message: "User not exists" });
+    return res.status(401).json({ success: false, message: "User not exists" });
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    return res.status(400).json({ success: false, message: "Wrong Password" });
+    return res.status(401).json({ success: false, message: "Wrong Password" });
   }
   const data = { user: { id: user.id } };
 
@@ -74,10 +74,12 @@ export const login = async (req, res) => {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   });
 
-  res.json({ success: true, token, message: "User Logged in" });
+  res.status(200).json({ success: true, token, message: "User Logged in" });
 };
 
 export const logout = async (req, res) => {
   res.clearCookie("token");
-  res.json({ success: true, message: "User logged out successfully" });
+  res
+    .status(200)
+    .json({ success: true, message: "User logged out successfully" });
 };
