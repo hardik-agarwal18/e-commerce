@@ -34,7 +34,7 @@ jobs:
 
       - name: Check syntax
         working-directory: ./backend
-        run: node -c server.js
+        run: node -c src/server.js
 
       - name: Setup MongoDB
         uses: supercharge/mongodb-github-action@1.10.0
