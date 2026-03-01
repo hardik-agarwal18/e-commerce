@@ -2,7 +2,7 @@ name: Backend CI/CD
 
 on:
   push:
-    branches: [master]
+    branches: [master, testing_implementation]
     paths:
       - "backend/**"
       - ".github/workflows/backend.yml"
@@ -36,15 +36,18 @@ jobs:
         working-directory: ./backend
         run: node -c server.js
 
+      - name: Setup MongoDB
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: "6.0"
+
       - name: Run tests
         working-directory: ./backend
-        run: |
-          if grep -q "\"test\":" package.json; then
-            npm test
-          else
-            echo "No tests configured"
-          fi
-        continue-on-error: true
+        run: npm test
+        env:
+          MONGODB_URI: mongodb://localhost:27017/test
+          JWT_SECRET: test-secret-key
+          NODE_ENV: test
 
       - name: Build check
         run: echo "✅ Backend build successful"
