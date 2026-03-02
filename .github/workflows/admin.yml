@@ -86,7 +86,7 @@ jobs:
           VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
         run: |
           echo "Deploying admin to Vercel..."
-          npx vercel --prod --token=$VERCEL_TOKEN --yes --cwd ./admin
+          npx vercel --prod --token=$VERCEL_TOKEN --yes
 
       - name: Verify deployment
         run: |
