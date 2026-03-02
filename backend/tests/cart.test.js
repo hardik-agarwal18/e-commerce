@@ -42,6 +42,13 @@ describe("Cart API", () => {
       new_price: 100,
       old_price: 150,
       stock: 10,
+      sizeStock: {
+        S: 10,
+        M: 10,
+        L: 10,
+        XL: 10,
+        XXL: 10,
+      },
       available: true,
     });
   }, 10000);
@@ -102,6 +109,13 @@ describe("Cart API", () => {
         new_price: 200,
         old_price: 250,
         stock: 0,
+        sizeStock: {
+          S: 0,
+          M: 0,
+          L: 0,
+          XL: 0,
+          XXL: 0,
+        },
         available: false,
       });
 
@@ -378,6 +392,212 @@ describe("Cart API", () => {
       });
 
       expect(res.statusCode).toBe(401);
+    });
+  });
+
+  describe("Size-wise Stock in Cart", () => {
+    let sizedProduct;
+
+    beforeAll(async () => {
+      // Create product with size-wise stock
+      sizedProduct = await Product.create({
+        id: 10,
+        name: "Sized T-Shirt",
+        image: "http://example.com/tshirt.jpg",
+        category: "men",
+        new_price: 50,
+        old_price: 75,
+        stock: 23,
+        sizeStock: {
+          S: 5,
+          M: 8,
+          L: 7,
+          XL: 3,
+          XXL: 0,
+        },
+        available: true,
+      });
+    });
+
+    beforeEach(async () => {
+      await Cart.deleteMany({});
+      await Users.findByIdAndUpdate(userId, { cartData: {} });
+    });
+
+    it("should add product with specific size to cart", async () => {
+      const res = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "M",
+          quantity: 2,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.cart.products).toHaveLength(1);
+      expect(res.body.cart.products[0].size).toBe("M");
+      expect(res.body.cart.products[0].quantity).toBe(2);
+    });
+
+    it("should reject when size is out of stock", async () => {
+      const res = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "XXL",
+          quantity: 1,
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain("Size XXL is out of stock");
+    });
+
+    it("should reject when quantity exceeds size-specific stock", async () => {
+      const res = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "XL",
+          quantity: 5, // Only 3 available in XL
+        });
+
+      expect(res.statusCode).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain("Only 3 items available in size XL");
+    });
+
+    it("should allow adding same product with different sizes", async () => {
+      // Add size M
+      await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "M",
+          quantity: 2,
+        });
+
+      // Add size L
+      const res = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "L",
+          quantity: 3,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.cart.products).toHaveLength(2);
+
+      const sizes = res.body.cart.products.map((p) => p.size);
+      expect(sizes).toContain("M");
+      expect(sizes).toContain("L");
+    });
+
+    it("should increment quantity for same product and size", async () => {
+      // Add first time
+      await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "M",
+          quantity: 2,
+        });
+
+      // Add again with same size
+      const res = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "M",
+          quantity: 3,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.cart.products).toHaveLength(1);
+      expect(res.body.cart.products[0].quantity).toBe(5);
+    });
+
+    it("should remove product with specific size from cart", async () => {
+      // Add two different sizes
+      await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "M",
+          quantity: 4,
+        });
+
+      await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "L",
+          quantity: 3,
+        });
+
+      // Remove only size M
+      const res = await request(app)
+        .post("/api/cart/removefromcart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "M",
+          quantity: 2,
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      const cart = await Cart.findOne({ userId });
+      expect(cart.products).toHaveLength(2);
+
+      const mProduct = cart.products.find((p) => p.size === "M");
+      const lProduct = cart.products.find((p) => p.size === "L");
+
+      expect(mProduct.quantity).toBe(2);
+      expect(lProduct.quantity).toBe(3);
+    });
+
+    it("should validate stock for each size independently", async () => {
+      // S has 5 items
+      const res1 = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "S",
+          quantity: 5,
+        });
+
+      expect(res1.statusCode).toBe(200);
+
+      // Try to add 6 items in size S (should fail)
+      await Cart.deleteMany({});
+
+      const res2 = await request(app)
+        .post("/api/cart/addtocart")
+        .set("auth-token", authToken)
+        .send({
+          itemId: sizedProduct._id.toString(),
+          size: "S",
+          quantity: 6,
+        });
+
+      expect(res2.statusCode).toBe(400);
+      expect(res2.body.message).toContain("Only 5 items available in size S");
     });
   });
 });

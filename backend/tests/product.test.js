@@ -323,4 +323,137 @@ describe("Product API", () => {
       expect(res.body.popularinwomen).toHaveLength(1);
     });
   });
+
+  describe("Size-wise Stock Management", () => {
+    const productWithSizeStock = {
+      name: "Sized Product",
+      image: "http://example.com/sized.jpg",
+      category: "men",
+      new_price: 100,
+      old_price: 150,
+      sizeStock: {
+        S: 5,
+        M: 10,
+        L: 8,
+        XL: 3,
+        XXL: 0,
+      },
+    };
+
+    it("should add product with size-wise stock", async () => {
+      const res = await request(app)
+        .post("/api/products/addproduct")
+        .set("auth-token", adminToken)
+        .send(productWithSizeStock);
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body.success).toBe(true);
+
+      const product = await Product.findOne({
+        name: productWithSizeStock.name,
+      });
+      expect(product).toBeDefined();
+      expect(product.sizeStock).toBeDefined();
+
+      // Convert Map to object for comparison if needed
+      const sizeStockObj =
+        product.sizeStock instanceof Map
+          ? Object.fromEntries(product.sizeStock)
+          : product.sizeStock;
+
+      expect(sizeStockObj.S).toBe(5);
+      expect(sizeStockObj.M).toBe(10);
+      expect(sizeStockObj.L).toBe(8);
+      expect(sizeStockObj.XL).toBe(3);
+      expect(sizeStockObj.XXL).toBe(0);
+    });
+
+    it("should calculate total stock from sizeStock", async () => {
+      const res = await request(app)
+        .post("/api/products/addproduct")
+        .set("auth-token", adminToken)
+        .send(productWithSizeStock);
+
+      expect(res.statusCode).toBe(200);
+
+      const product = await Product.findOne({
+        name: productWithSizeStock.name,
+      });
+      expect(product.stock).toBe(26); // 5+10+8+3+0
+      expect(product.available).toBe(true);
+    });
+
+    it("should set available to true when total stock > 0", async () => {
+      const res = await request(app)
+        .post("/api/products/addproduct")
+        .set("auth-token", adminToken)
+        .send(productWithSizeStock);
+
+      expect(res.statusCode).toBe(200);
+
+      const product = await Product.findOne({
+        name: productWithSizeStock.name,
+      });
+      expect(product.available).toBe(true);
+    });
+
+    it("should set available to false when all sizes out of stock", async () => {
+      const outOfStockProduct = {
+        ...productWithSizeStock,
+        name: "Out of Stock Sized Product",
+        sizeStock: {
+          S: 0,
+          M: 0,
+          L: 0,
+          XL: 0,
+          XXL: 0,
+        },
+      };
+
+      const res = await request(app)
+        .post("/api/products/addproduct")
+        .set("auth-token", adminToken)
+        .send(outOfStockProduct);
+
+      expect(res.statusCode).toBe(200);
+
+      const product = await Product.findOne({ name: outOfStockProduct.name });
+      expect(product.stock).toBe(0);
+      expect(product.available).toBe(false);
+    });
+
+    it("should use default sizeStock if not provided", async () => {
+      const productWithoutSizeStock = {
+        name: "Product Without SizeStock",
+        image: "http://example.com/nosizes.jpg",
+        category: "women",
+        new_price: 80,
+        old_price: 120,
+        stock: 15,
+      };
+
+      const res = await request(app)
+        .post("/api/products/addproduct")
+        .set("auth-token", adminToken)
+        .send(productWithoutSizeStock);
+
+      expect(res.statusCode).toBe(200);
+
+      const product = await Product.findOne({
+        name: productWithoutSizeStock.name,
+      });
+      expect(product.sizeStock).toBeDefined();
+
+      const sizeStockObj =
+        product.sizeStock instanceof Map
+          ? Object.fromEntries(product.sizeStock)
+          : product.sizeStock;
+
+      expect(sizeStockObj.S).toBe(0);
+      expect(sizeStockObj.M).toBe(0);
+      expect(sizeStockObj.L).toBe(0);
+      expect(sizeStockObj.XL).toBe(0);
+      expect(sizeStockObj.XXL).toBe(0);
+    });
+  });
 });
