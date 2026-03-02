@@ -1,7 +1,8 @@
 import WishList from "../models/WishListModel.js";
 
 export const addtowishlist = async (req, res) => {
-  const { userId, productId } = req.body;
+  const { productId } = req.body;
+  const userId = req.user.id;
 
   try {
     let wishlist = await WishList.findOne({ userId });
@@ -29,7 +30,8 @@ export const addtowishlist = async (req, res) => {
 };
 
 export const removefromwishlist = async (req, res) => {
-  const { userId, productId } = req.body;
+  const { productId } = req.body;
+  const userId = req.user.id;
 
   try {
     const wishlist = await WishList.findOne({ userId });
@@ -51,7 +53,7 @@ export const removefromwishlist = async (req, res) => {
 };
 
 export const wishlistItems = async (req, res) => {
-  const { userId } = req.body;
+  const userId = req.user.id;
 
   try {
     const wishlist = await WishList.findOne({ userId }).populate(
