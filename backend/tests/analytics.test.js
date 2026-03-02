@@ -47,8 +47,8 @@ describe("Analytics API", () => {
     });
 
     it("should return correct user count", async () => {
-      // Create test users
-      const users = [
+      // Create test users directly in database to avoid race conditions with auth tests
+      await Users.create([
         {
           name: "User 1",
           email: "analytics-user1@test.com",
@@ -64,11 +64,7 @@ describe("Analytics API", () => {
           email: "analytics-user3@test.com",
           password: "123456",
         },
-      ];
-
-      for (const user of users) {
-        await request(app).post("/api/auth/signup").send(user);
-      }
+      ]);
 
       const res = await request(app)
         .get("/api/analytics/user-count")
