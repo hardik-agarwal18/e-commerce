@@ -31,12 +31,10 @@ describe("Analytics API", () => {
   });
 
   describe("GET /api/analytics/user-count", () => {
-    beforeEach(async () => {
-      // Clear users for this specific test group
-      await Users.deleteMany({});
-    });
-
     it("should return 0 when there are no users", async () => {
+      // Clear users for this specific test only
+      await Users.deleteMany({});
+
       const res = await request(app)
         .get("/api/analytics/user-count")
         .set("auth-token", adminToken);
@@ -47,7 +45,8 @@ describe("Analytics API", () => {
     });
 
     it("should return correct user count", async () => {
-      // Create test users directly in database to avoid race conditions with auth tests
+      // Clear users and create test users directly in database
+      await Users.deleteMany({});
       await Users.create([
         {
           name: "User 1",
@@ -83,12 +82,10 @@ describe("Analytics API", () => {
   });
 
   describe("GET /api/analytics/product-count", () => {
-    beforeEach(async () => {
-      // Clear products for this specific test group
-      await Product.deleteMany({});
-    });
-
     it("should return 0 when there are no products", async () => {
+      // Clear products for this specific test only
+      await Product.deleteMany({});
+
       const res = await request(app)
         .get("/api/analytics/product-count")
         .set("auth-token", adminToken);
@@ -99,7 +96,8 @@ describe("Analytics API", () => {
     });
 
     it("should return correct product count", async () => {
-      // Create test products
+      // Clear products and create test products
+      await Product.deleteMany({});
       const products = [
         {
           id: 1,
