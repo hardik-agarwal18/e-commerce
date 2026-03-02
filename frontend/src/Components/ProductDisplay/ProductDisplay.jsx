@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./ProductDisplay.css";
 import star_icon from "../../Assets/star_icon.png";
 import star_dull_icon from "../../Assets/star_dull_icon.png";
@@ -7,6 +7,38 @@ import { ShopContext } from "../../Context/ShopContext";
 const ProductDisplay = (props) => {
   const { product } = props;
   const { addToCart } = useContext(ShopContext);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [sizeError, setSizeError] = useState("");
+
+  const sizes = ["S", "M", "L", "XL", "XXL"];
+
+  const handleSizeSelect = (size) => {
+    setSelectedSize(size);
+    setSizeError("");
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      setSizeError("Please select a size");
+      return;
+    }
+
+    // Check if size is in stock
+    if (product.sizeStock && product.sizeStock[selectedSize] <= 0) {
+      setSizeError(`Size ${selectedSize} is out of stock`);
+      return;
+    }
+
+    addToCart(product.id, selectedSize);
+    setSizeError("");
+  };
+
+  const getSizeStock = (size) => {
+    if (product.sizeStock && product.sizeStock[size] !== undefined) {
+      return product.sizeStock[size];
+    }
+    return 0;
+  };
 
   return (
     <div className="productdisplay">
@@ -51,20 +83,31 @@ const ProductDisplay = (props) => {
         <div className="productdisplay-right-size">
           <h1>Select Size</h1>
           <div className="productdisplay-right-sizes">
-            <div>S</div>
-            <div>M</div>
-            <div>L</div>
-            <div>XL</div>
-            <div>XXL</div>
+            {sizes.map((size) => {
+              const stock = getSizeStock(size);
+              const isOutOfStock = stock <= 0;
+              const isLowStock = stock > 0 && stock <= 5;
+              return (
+                <div
+                  key={size}
+                  className={`size-option ${selectedSize === size ? "selected" : ""} ${isOutOfStock ? "out-of-stock" : ""} ${isLowStock ? "low-stock" : ""}`}
+                  onClick={() => !isOutOfStock && handleSizeSelect(size)}
+                  title={isOutOfStock ? "Out of stock" : `${stock} in stock`}
+                >
+                  <span className="size-label">{size}</span>
+                  {!isOutOfStock && (
+                    <span className="stock-count">{stock}</span>
+                  )}
+                  {isOutOfStock && (
+                    <span className="sold-out-badge">Sold Out</span>
+                  )}
+                </div>
+              );
+            })}
           </div>
+          {sizeError && <p className="size-error">{sizeError}</p>}
         </div>
-        <button
-          onClick={() => {
-            addToCart(product.id);
-          }}
-        >
-          ADD TO CART
-        </button>
+        <button onClick={handleAddToCart}>ADD TO CART</button>
         <p className="productdisplay-right-category">
           <span>Category:</span> Women, T-Shirt, Crop Top
         </p>
