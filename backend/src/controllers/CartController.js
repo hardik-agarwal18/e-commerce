@@ -4,7 +4,7 @@ import Cart from "../models/CartModel.js";
 
 export const addToCart = async (req, res) => {
   try {
-    console.log("Add to cart request:", req.body);
+    // console.log("Add to cart request:", req.body);
     const { itemId, size, quantity = 1 } = req.body;
     const userId = req.user.id;
 
@@ -78,7 +78,7 @@ export const addToCart = async (req, res) => {
     } else {
       // Update existing cart
       const existingProductIndex = cart.products.findIndex(
-        (p) => p.productId.toString() === itemId && p.size === (size || null)
+        (p) => p.productId.toString() === itemId && p.size === (size || null),
       );
 
       if (existingProductIndex > -1) {
@@ -98,7 +98,7 @@ export const addToCart = async (req, res) => {
       // Recalculate total amount
       cart.totalAmount = cart.products.reduce(
         (total, product) => total + product.price * product.quantity,
-        0
+        0,
       );
     }
 
@@ -108,7 +108,7 @@ export const addToCart = async (req, res) => {
       cart.save(),
     ]);
 
-    console.log("Cart updated successfully");
+    // console.log("Cart updated successfully");
     res.json({
       success: true,
       message: "Product added to cart",
@@ -126,7 +126,7 @@ export const addToCart = async (req, res) => {
 
 export const removeFromCart = async (req, res) => {
   try {
-    console.log("Remove from cart request:", req.body);
+    // console.log("Remove from cart request:", req.body);
     const { itemId, size, quantity = 1 } = req.body;
     const userId = req.user.id;
 
@@ -158,7 +158,7 @@ export const removeFromCart = async (req, res) => {
 
     if (cart) {
       const productIndex = cart.products.findIndex(
-        (p) => p.productId.toString() === itemId && p.size === (size || null)
+        (p) => p.productId.toString() === itemId && p.size === (size || null),
       );
 
       if (productIndex > -1) {
@@ -172,7 +172,7 @@ export const removeFromCart = async (req, res) => {
         // Recalculate total amount
         cart.totalAmount = cart.products.reduce(
           (total, product) => total + product.price * product.quantity,
-          0
+          0,
         );
 
         // Save cart or delete if empty
@@ -187,7 +187,7 @@ export const removeFromCart = async (req, res) => {
     // Save user cartData
     await Users.findByIdAndUpdate(userId, { cartData: user.cartData });
 
-    console.log("Cart updated successfully");
+    // console.log("Cart updated successfully");
     res.json({
       success: true,
       message: "Product removed from cart",
@@ -305,7 +305,7 @@ export const updateCartItemQuantity = async (req, res) => {
     const cart = await Cart.findOne({ userId: userId });
     if (cart) {
       const productIndex = cart.products.findIndex(
-        (p) => p.productId.toString() === itemId && p.size === (size || null)
+        (p) => p.productId.toString() === itemId && p.size === (size || null),
       );
 
       if (productIndex > -1) {
@@ -319,7 +319,7 @@ export const updateCartItemQuantity = async (req, res) => {
         // Recalculate total
         cart.totalAmount = cart.products.reduce(
           (total, product) => total + product.price * product.quantity,
-          0
+          0,
         );
 
         if (cart.products.length === 0) {
