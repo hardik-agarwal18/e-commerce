@@ -1,7 +1,8 @@
 import Product from "../models/ProductModel.js";
 
 export const addProduct = async (req, res) => {
-  const { name, image, category, new_price, old_price, stock } = req.body;
+  const { name, image, category, new_price, old_price, stock, sizeStock } =
+    req.body;
 
   let products = await Product.find({});
   let id;
@@ -11,6 +12,13 @@ export const addProduct = async (req, res) => {
   } else {
     id = 1;
   }
+
+  // Calculate total stock from sizeStock if provided, otherwise use stock
+  let totalStock = stock || 0;
+  if (sizeStock) {
+    totalStock = Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0);
+  }
+
   const product = new Product({
     id: id,
     name: name,
@@ -18,8 +26,15 @@ export const addProduct = async (req, res) => {
     category: category,
     new_price: new_price,
     old_price: old_price,
-    stock: stock,
-    available: stock > 0,
+    stock: totalStock,
+    sizeStock: sizeStock || {
+      S: 0,
+      M: 0,
+      L: 0,
+      XL: 0,
+      XXL: 0,
+    },
+    available: totalStock > 0,
   });
   // console.log(product);
 
