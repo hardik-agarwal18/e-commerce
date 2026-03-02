@@ -36,7 +36,7 @@ describe("Analytics API", () => {
     it("should return 0 when there are no users", async () => {
       const res = await request(app)
         .get("/api/analytics/user-count")
-        .set("Authorization", `Bearer ${adminToken}`);
+        .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
@@ -69,7 +69,7 @@ describe("Analytics API", () => {
 
       const res = await request(app)
         .get("/api/analytics/user-count")
-        .set("Authorization", `Bearer ${adminToken}`);
+        .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
@@ -87,7 +87,7 @@ describe("Analytics API", () => {
     it("should return 0 when there are no products", async () => {
       const res = await request(app)
         .get("/api/analytics/product-count")
-        .set("Authorization", `Bearer ${adminToken}`);
+        .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
@@ -135,7 +135,7 @@ describe("Analytics API", () => {
 
       const res = await request(app)
         .get("/api/analytics/product-count")
-        .set("Authorization", `Bearer ${adminToken}`);
+        .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
