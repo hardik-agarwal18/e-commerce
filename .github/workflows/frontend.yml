@@ -89,7 +89,7 @@ jobs:
           REACT_APP_BACKEND_URL: ${{ secrets.REACT_APP_BACKEND_URL }}
         run: |
           echo "Deploying frontend to Vercel..."
-          npx vercel --prod --token=$VERCEL_TOKEN --yes --cwd ./frontend
+          npx vercel --prod --token=$VERCEL_TOKEN --yes
 
       - name: Verify deployment
         run: |
