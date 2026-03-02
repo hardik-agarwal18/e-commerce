@@ -29,7 +29,19 @@ const Product = mongoose.model("Product", {
     type: Date,
     default: Date.now,
   },
-  stock: { type: Number, required: true, default: 0 },
+  stock: { type: Number, required: false, default: 0 }, // Keep for backward compatibility
+  sizeStock: {
+    type: Map,
+    of: Number,
+    default: () =>
+      new Map([
+        ["S", 0],
+        ["M", 0],
+        ["L", 0],
+        ["XL", 0],
+        ["XXL", 0],
+      ]),
+  },
   available: {
     type: Boolean,
     default: true,
