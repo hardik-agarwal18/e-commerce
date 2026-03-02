@@ -5,6 +5,7 @@ import { axiosInstance } from "../../lib/axios";
 
 const ListProduct = () => {
   const [allProducts, setAllProducts] = useState([]);
+  const [expandedProduct, setExpandedProduct] = useState(null);
 
   const fetchInfo = async () => {
     try {
@@ -27,6 +28,20 @@ const ListProduct = () => {
       console.error("Error removing product:", error);
     }
   };
+
+  const getTotalStock = (product) => {
+    if (product.sizeStock) {
+      return Object.values(product.sizeStock).reduce(
+        (sum, qty) => sum + qty,
+        0,
+      );
+    }
+    return product.stock || 0;
+  };
+
+  const toggleStockDetails = (productId) => {
+    setExpandedProduct(expandedProduct === productId ? null : productId);
+  };
   return (
     <div className="list-product">
       <h1>All Products List</h1>
@@ -36,17 +51,18 @@ const ListProduct = () => {
         <p>Old Price</p>
         <p>New Price</p>
         <p>Category</p>
+        <p>Stock</p>
         <p>Remove</p>
       </div>
       <div className="listproduct-allproducts">
         <hr />
         {allProducts.map((product, index) => {
+          const totalStock = getTotalStock(product);
+          const isExpanded = expandedProduct === product.id;
+
           return (
-            <>
-              <div
-                key={index}
-                className="listproduct-format-main listproduct-format"
-              >
+            <div key={index}>
+              <div className="listproduct-format-main listproduct-format">
                 <img
                   src={product.image}
                   alt=""
@@ -56,6 +72,24 @@ const ListProduct = () => {
                 <p>${product.old_price}</p>
                 <p>${product.new_price}</p>
                 <p>{product.category}</p>
+                <div className="stock-cell">
+                  <span
+                    className={`stock-badge ${totalStock <= 5 ? "low-stock" : ""} ${totalStock === 0 ? "out-of-stock" : ""}`}
+                    onClick={() =>
+                      product.sizeStock && toggleStockDetails(product.id)
+                    }
+                    style={{
+                      cursor: product.sizeStock ? "pointer" : "default",
+                    }}
+                  >
+                    {totalStock}
+                    {product.sizeStock && (
+                      <span className="expand-icon">
+                        {isExpanded ? "▲" : "▼"}
+                      </span>
+                    )}
+                  </span>
+                </div>
                 <img
                   onClick={() => {
                     remove_product(product.id);
@@ -65,8 +99,25 @@ const ListProduct = () => {
                   className="listproduct-remove-icon"
                 />
               </div>
+              {isExpanded && product.sizeStock && (
+                <div className="size-stock-details">
+                  <h4>Stock by Size:</h4>
+                  <div className="size-stock-grid">
+                    {Object.entries(product.sizeStock).map(([size, qty]) => (
+                      <div key={size} className="size-stock-badge">
+                        <span className="size-label">{size}</span>
+                        <span
+                          className={`size-qty ${qty <= 3 ? "low" : ""} ${qty === 0 ? "empty" : ""}`}
+                        >
+                          {qty}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <hr />
-            </>
+            </div>
           );
         })}
       </div>

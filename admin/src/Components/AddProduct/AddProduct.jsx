@@ -12,16 +12,30 @@ const AddProduct = () => {
     new_price: "",
     old_price: "",
   });
+  const [sizeStock, setSizeStock] = useState({
+    S: 0,
+    M: 0,
+    L: 0,
+    XL: 0,
+    XXL: 0,
+  });
+
   const imageHandler = (e) => {
     setImage(e.target.files[0]);
   };
+
   const changeHandler = (e) => {
     setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
   };
 
+  const sizeStockHandler = (e) => {
+    const { name, value } = e.target;
+    setSizeStock({ ...sizeStock, [name]: parseInt(value) || 0 });
+  };
+
   const Add_Product = async () => {
     console.log(productDetails);
-    let product = productDetails;
+    let product = { ...productDetails };
 
     let formData = new FormData();
     formData.append("product", image);
@@ -36,16 +50,35 @@ const AddProduct = () => {
 
       if (uploadRes.data.success) {
         product.image = uploadRes.data.image_url;
+        product.sizeStock = sizeStock;
+
+        // Calculate total stock from size stock
+        const totalStock = Object.values(sizeStock).reduce(
+          (sum, qty) => sum + qty,
+          0,
+        );
+        product.stock = totalStock;
+
         console.log(product);
 
         // Add product
         const addProductRes = await axiosInstance.post(
           "/products/addproduct",
-          product
+          product,
         );
 
         if (addProductRes.data.success) {
           alert("Product added successfully");
+          // Reset form
+          setProductDetails({
+            name: "",
+            image: "",
+            category: "women",
+            new_price: "",
+            old_price: "",
+          });
+          setSizeStock({ S: 0, M: 0, L: 0, XL: 0, XXL: 0 });
+          setImage(false);
         } else {
           alert("Failed to add product");
         }
@@ -102,6 +135,29 @@ const AddProduct = () => {
           <option value="men">Men</option>
           <option value="kid">Kids</option>
         </select>
+      </div>
+
+      <div className="addproduct-itemfield">
+        <p>Stock by Size</p>
+        <div className="size-stock-container">
+          {Object.keys(sizeStock).map((size) => (
+            <div key={size} className="size-stock-item">
+              <label>{size}</label>
+              <input
+                type="number"
+                name={size}
+                value={sizeStock[size]}
+                onChange={sizeStockHandler}
+                min="0"
+                placeholder="0"
+              />
+            </div>
+          ))}
+        </div>
+        <p className="total-stock-info">
+          Total Stock:{" "}
+          {Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0)} items
+        </p>
       </div>
       <div className="addproduct-itemfield">
         <label htmlFor="file-input">
