@@ -3,7 +3,7 @@ import "./Navbar.css";
 
 import logo from "../../Assets/logo.png";
 import cart_icon from "../../Assets/cart_icon.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
 import nav_dropdown from "../../Assets/nav_dropdown.png";
 import { axiosInstance } from "../../lib/axios";
@@ -13,10 +13,21 @@ const Navbar = () => {
   const [menu, setMenu] = useState("shop");
   const { getTotalCartItems } = useContext(ShopContext);
   const menuRef = useRef();
+  const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("auth-token");
+  const cartItemCount = getTotalCartItems();
 
   const dropdown_toggle = (e) => {
     menuRef.current.classList.toggle("nav-menu-visible");
     e.target.classList.toggle("open");
+  };
+
+  const handleCartClick = (e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      // Show a subtle message or redirect to login
+      navigate("/login");
+    }
   };
 
   const handleLogout = async () => {
@@ -98,10 +109,19 @@ const Navbar = () => {
             </button>
           </Link>
         )}
-        <Link to="/cart">
-          <img src={cart_icon} alt="Cart Icon" />
+        <Link
+          to={isLoggedIn ? "/cart" : "/login"}
+          className={`cart-icon-container ${!isLoggedIn ? "cart-disabled" : ""}`}
+          onClick={handleCartClick}
+          title={isLoggedIn ? "View Cart" : "Login to view cart"}
+        >
+          <img src={cart_icon} alt="Cart Icon" className="cart-icon" />
+          {cartItemCount > 0 && (
+            <div className="nav-cart-badge">
+              {cartItemCount > 99 ? "99+" : cartItemCount}
+            </div>
+          )}
         </Link>
-        <div className="nav-cart-count">{getTotalCartItems()}</div>
       </div>
     </div>
   );
