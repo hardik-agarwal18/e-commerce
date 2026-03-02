@@ -2,7 +2,7 @@ name: Admin CI/CD
 
 on:
   push:
-    branches: [master]
+    branches: ["**"]
     paths:
       - "admin/**"
       - ".github/workflows/admin.yml"

@@ -26,7 +26,7 @@
 
 .listproduct-format-main {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 1fr 1fr 80px;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 100px 80px;
   gap: 20px;
   width: 100%;
   padding: 20px 25px;
@@ -41,7 +41,7 @@
 
 .listproduct-format {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 1fr 1fr 80px;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 100px 80px;
   gap: 20px;
   width: 100%;
   padding: 20px 25px;
@@ -130,6 +130,124 @@
   margin: 15px 0;
 }
 
+.stock-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  font-weight: 700;
+  border-radius: 20px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(72, 187, 120, 0.3);
+  transition: all 0.3s ease;
+}
+
+.stock-badge.low-stock {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+  box-shadow: 0 2px 8px rgba(237, 137, 54, 0.3);
+}
+
+.stock-badge.out-of-stock {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+  box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+}
+
+.stock-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.stock-badge.low-stock:hover {
+  box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+}
+
+.stock-badge.out-of-stock:hover {
+  box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+}
+
+.expand-icon {
+  font-size: 10px;
+  margin-left: 4px;
+  opacity: 0.8;
+}
+
+.size-stock-details {
+  padding: 20px 25px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  border-radius: 12px;
+  margin: 10px 0;
+  border: 2px solid #e2e8f0;
+}
+
+.size-stock-details h4 {
+  margin: 0 0 15px 0;
+  color: #667eea;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.size-stock-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.size-stock-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.size-stock-badge:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.size-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #667eea;
+  text-transform: uppercase;
+}
+
+.size-qty {
+  font-size: 18px;
+  font-weight: 700;
+  color: #48bb78;
+  padding: 4px 12px;
+  background: #f0fff4;
+  border-radius: 8px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.size-qty.low {
+  color: #ed8936;
+  background: #fffaf0;
+}
+
+.size-qty.empty {
+  color: #f56565;
+  background: #fff5f5;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .list-product {
@@ -139,6 +257,10 @@
   .listproduct-format-main {
     gap: 8px;
     font-size: 14px;
+  }
+  .size-stock-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
   }
 }
 
@@ -156,7 +278,7 @@
     margin-bottom: 15px;
   }
   .listproduct-format-main {
-    grid-template-columns: 50px 1.5fr 0.8fr 0.8fr 0.8fr 35px;
+    grid-template-columns: 50px 1.5fr 0.8fr 0.8fr 0.8fr 70px 35px;
     padding: 12px 5px;
     font-size: 11px;
     gap: 5px;
@@ -172,6 +294,20 @@
   .listproduct-allproducts {
     max-height: 500px;
   }
+  .stock-badge {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .size-stock-details {
+    padding: 15px;
+  }
+  .size-stock-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .size-stock-badge {
+    padding: 8px;
+  }
 }
 
 @media (max-width: 500px) {
@@ -185,7 +321,7 @@
     margin-bottom: 12px;
   }
   .listproduct-format-main {
-    grid-template-columns: 40px 1.2fr 0.7fr 0.7fr 30px;
+    grid-template-columns: 40px 1.2fr 0.7fr 0.7fr 50px 30px;
     padding: 10px 3px;
     font-size: 10px;
     gap: 3px;
@@ -206,5 +342,33 @@
   }
   .listproduct-allproducts {
     max-height: 400px;
+  }
+  .stock-badge {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  .expand-icon {
+    display: none;
+  }
+  .size-stock-details {
+    padding: 10px;
+  }
+  .size-stock-details h4 {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  .size-stock-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .size-stock-badge {
+    padding: 6px;
+  }
+  .size-label {
+    font-size: 11px;
+  }
+  .size-qty {
+    font-size: 14px;
+    padding: 3px 8px;
   }
 }

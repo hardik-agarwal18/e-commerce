@@ -20,7 +20,7 @@ const ShopContextProvider = (props) => {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          "/api/products/getallproducts"
+          "/api/products/getallproducts",
         );
         setAllProduct(response.data);
       } catch (error) {
@@ -51,58 +51,78 @@ const ShopContextProvider = (props) => {
     fetchCartData();
   }, []);
 
-  const addToCart = async (itemId) => {
+  const addToCart = async (itemId, size = null) => {
+    // Update local state
+    const cartKey = size ? `${itemId}_${size}` : itemId;
     setCartItems((prev) => ({
       ...prev,
-      [itemId]: (prev[itemId] || 0) + 1,
+      [cartKey]: (prev[cartKey] || 0) + 1,
     }));
 
     if (localStorage.getItem("auth-token")) {
       try {
+        const requestBody = { itemId: itemId };
+        if (size) {
+          requestBody.size = size;
+        }
+
         const response = await axiosInstance.post(
           "/api/cart/addtocart",
-          {
-            itemId: itemId,
-          },
+          requestBody,
           {
             headers: {
               "auth-token": localStorage.getItem("auth-token"),
             },
-          }
+          },
         );
         if (response.data.success) {
           console.log("Product added to cart successfully");
         }
       } catch (error) {
         console.error("Error adding to cart:", error);
+        // Revert local state on error
+        setCartItems((prev) => ({
+          ...prev,
+          [cartKey]: Math.max((prev[cartKey] || 0) - 1, 0),
+        }));
       }
     }
   };
 
-  const removeFromCart = async (itemId) => {
+  const removeFromCart = async (itemId, size = null) => {
+    // Update local state
+    const cartKey = size ? `${itemId}_${size}` : itemId;
     setCartItems((prev) => ({
       ...prev,
-      [itemId]: Math.max((prev[itemId] || 0) - 1, 0),
+      [cartKey]: Math.max((prev[cartKey] || 0) - 1, 0),
     }));
 
     if (localStorage.getItem("auth-token")) {
       try {
+        const requestBody = { itemId: itemId };
+        if (size) {
+          requestBody.size = size;
+        }
+
         const response = await axiosInstance.post(
           "/api/cart/removefromcart",
-          {
-            itemId: itemId,
-          },
+          requestBody,
           {
             headers: {
               "auth-token": localStorage.getItem("auth-token"),
             },
-          }
+          },
         );
         if (response.data.success) {
           console.log("Product removed from cart successfully");
         }
       } catch (error) {
         console.error("Error removing from cart:", error);
+        // Revert local state on error
+        setCartItems((prev) => ({
+          ...prev,
+          [cartKey]: (prev[cartKey] || 0) + 1,
+        }));
       }
     }
   };

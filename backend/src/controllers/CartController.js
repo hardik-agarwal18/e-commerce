@@ -26,25 +26,51 @@ export const addToCart = async (req, res) => {
       });
     }
 
-    // Check stock availability
-    if (product.stock <= 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Product is out of stock" });
+    // Check stock availability based on size
+    let availableStock = product.stock;
+
+    if (size && product.sizeStock) {
+      // If size is provided and sizeStock exists, check size-specific stock
+      const sizeStockMap =
+        product.sizeStock instanceof Map
+          ? product.sizeStock
+          : new Map(Object.entries(product.sizeStock));
+      availableStock = sizeStockMap.get(size) || 0;
+
+      if (availableStock <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Size ${size} is out of stock`,
+        });
+      }
+
+      if (quantity > availableStock) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${availableStock} items available in size ${size}`,
+        });
+      }
+    } else {
+      // Fall back to general stock check
+      if (availableStock <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: "Product is out of stock",
+        });
+      }
+
+      if (quantity > availableStock) {
+        return res.status(400).json({
+          success: false,
+          message: `Only ${availableStock} items available in stock`,
+        });
+      }
     }
 
     if (product.available === false) {
       return res
         .status(400)
         .json({ success: false, message: "Product is not available" });
-    }
-
-    // Check if requested quantity is available
-    if (quantity > product.stock) {
-      return res.status(400).json({
-        success: false,
-        message: `Only ${product.stock} items available in stock`,
-      });
     }
 
     // Update User's cartData (backward compatibility)
