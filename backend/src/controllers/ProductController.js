@@ -21,10 +21,10 @@ export const addProduct = async (req, res) => {
     stock: stock,
     available: stock > 0,
   });
-  console.log(product);
+  // console.log(product);
 
   await product.save();
-  console.log("Saved");
+  // console.log("Saved");
 
   res.json({
     success: true,
@@ -42,7 +42,7 @@ export const deleteProduct = async (req, res) => {
         message: "Product not found",
       });
     }
-    console.log("Removed the Product");
+    // console.log("Removed the Product");
     res.json({
       success: true,
       message: "Removed the Product",
@@ -59,7 +59,7 @@ export const deleteProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   let products = await Product.find({});
-  console.log("All Products Fetched");
+  // console.log("All Products Fetched");
   res.send(products);
 };
 
