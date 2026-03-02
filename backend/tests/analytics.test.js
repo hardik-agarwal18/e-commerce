@@ -8,22 +8,20 @@ describe("Analytics API", () => {
   let adminToken;
 
   const adminUser = {
-    email: process.env.ADMIN_EMAIL || "admin@example.com",
-    password: process.env.ADMIN_PASSWORD || "admin123",
+    email: "admin@example.com",
+    password: "admin123",
   };
 
   beforeAll(async () => {
+    // Set admin credentials in environment variables for testing
+    process.env.ADMIN_EMAIL = adminUser.email;
+    process.env.ADMIN_PASSWORD = adminUser.password;
+
     // Login as admin
     const loginRes = await request(app)
       .post("/api/admin/login")
       .send(adminUser);
     adminToken = loginRes.body.token;
-  });
-
-  beforeEach(async () => {
-    // Clear collections before each test
-    await Users.deleteMany({});
-    await Product.deleteMany({});
   });
 
   afterAll(async () => {
@@ -33,6 +31,11 @@ describe("Analytics API", () => {
   });
 
   describe("GET /api/analytics/user-count", () => {
+    beforeEach(async () => {
+      // Clear users for this specific test group
+      await Users.deleteMany({});
+    });
+
     it("should return 0 when there are no users", async () => {
       const res = await request(app)
         .get("/api/analytics/user-count")
@@ -84,6 +87,11 @@ describe("Analytics API", () => {
   });
 
   describe("GET /api/analytics/product-count", () => {
+    beforeEach(async () => {
+      // Clear products for this specific test group
+      await Product.deleteMany({});
+    });
+
     it("should return 0 when there are no products", async () => {
       const res = await request(app)
         .get("/api/analytics/product-count")
