@@ -40,27 +40,32 @@ A modern, full-stack e-commerce application built with React.js, Node.js, Expres
 - **Shopping Cart**: Add, remove, and manage cart items with real-time updates
 - **User Authentication**: Secure login and registration with JWT tokens
 - **Product Details**: Detailed product information with multiple images
-- **Wishlist**: Save favorite products for later
-- **Order History**: Track past purchases and order status
+- **Wishlist**: ✅ Save favorite products with floating heart buttons and dedicated wishlist page
+- **Order History**: ✅ Track past purchases and order status with order management dashboard
+- **Toast Notifications**: ✅ User-friendly notifications using Sonner library for all user actions
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **Real-time Cart Updates**: Persistent cart across sessions
+- **Address Management**: Save multiple shipping addresses with default selection
+- **Order Tracking**: View order status with color-coded badges (pending, processing, shipped, delivered, cancelled)
+- **Cancel Orders**: Cancel pending orders directly from order history
 
-### 🔧 Admin Features
+### � Admin Features
 
 - **Product Management**: Add, edit, and delete products with bulk operations
-- **Image Upload**: Multi-image upload with preview and optimization
+- **Image Upload**: Multi-image upload with Cloudinary integration, preview, and optimization
 - **Inventory Management**: Track product stock, pricing, and availability
 - **User Management**: Monitor registered users and activity
-- **Order Management**: Process orders, update status, and track deliveries
+- **Order Management**: ✅ Process orders, update status (pending → processing → shipped → delivered), and track deliveries
 - **Dashboard Analytics**: Sales metrics, revenue charts, and product insights
 - **Protected Routes**: Role-based access control for admin features
 - **Responsive Admin Panel**: Mobile-friendly admin interface
+- **Order Status Updates**: Admin can update order status with auto-timestamping
 
 ### 🚀 Technical Features
 
 - **RESTful API**: Well-structured backend endpoints with proper HTTP methods
-- **JWT Authentication**: Secure token-based authentication with refresh tokens
-- **File Upload**: Image handling with Multer and validation
+- **JWT Authentication**: Secure token-based authentication with HTTP-only cookies
+- **File Upload**: Image handling with Multer and Cloudinary integration
 - **Database Integration**: MongoDB with Mongoose ODM and indexing
 - **CORS Support**: Cross-origin resource sharing configuration
 - **Environment Configuration**: Secure environment variables management
@@ -68,6 +73,10 @@ A modern, full-stack e-commerce application built with React.js, Node.js, Expres
 - **Input Validation**: Server-side data validation and sanitization
 - **Rate Limiting**: API protection against abuse
 - **Security Middleware**: Helmet, bcrypt password hashing
+- **Toast Notifications**: ✅ Sonner library integration for elegant user feedback
+- **State Management**: Context API with optimistic UI updates
+- **Conditional Rendering**: Authentication-aware UI components (wishlist/orders icons)
+- **Order System**: Complete order creation, tracking, and cancellation workflow
 
 ## 🚀 CI/CD & Deployment
 
@@ -421,6 +430,7 @@ Configure these secrets in: **Repository Settings → Secrets and variables → 
 - **React.js 18.3.1** - UI framework
 - **React Router DOM** - Client-side routing
 - **Axios** - HTTP client for API calls
+- **Sonner 2.0.7** - ✅ Toast notification library for user feedback
 - **CSS3** - Styling and responsive design
 
 ### Backend
@@ -849,7 +859,8 @@ When you create a pull request:
 
 ### Planned Features
 
-- 🛒 **Order Management System**: Complete order tracking and management
+- ✅ **Order Management System**: ~~Complete order tracking and management~~ IMPLEMENTED
+- ✅ **Wishlist System**: ~~Save and manage favorite products~~ IMPLEMENTED
 - 💳 **Payment Integration**: Stripe/PayPal payment gateway
 - 📧 **Email Notifications**: Order confirmations and updates
 - 🔍 **Advanced Search**: Elasticsearch integration
@@ -859,6 +870,7 @@ When you create a pull request:
 - 📊 **Analytics Dashboard**: Advanced sales analytics
 - 🎁 **Coupon System**: Discount codes and promotions
 - ⭐ **Product Reviews**: Customer rating and review system
+- 🔔 **Push Notifications**: Real-time order and promotion notifications
 
 ### Architecture Improvements
 
