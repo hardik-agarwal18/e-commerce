@@ -11,6 +11,7 @@ import AdminRoutes from "./routes/AdminRoutes.js";
 import AnalyticsRoutes from "./routes/AnalyticsRoutes.js";
 import CartRoutes from "./routes/CartRoutes.js";
 import UserRoutes from "./routes/UserRoutes.js";
+import OrderRoutes from "./routes/OrderRoutes.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
 
 dotenv.config();
@@ -43,7 +44,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 app.use(morgan("dev"));
 
@@ -65,6 +66,7 @@ app.use("/api/admin", AdminRoutes);
 app.use("/api/analytics", AnalyticsRoutes);
 app.use("/api/cart", CartRoutes);
 app.use("/api/user", UserRoutes);
+app.use("/api/orders", OrderRoutes);
 
 app.use(globalLimiter);
 

@@ -9,6 +9,7 @@ import Cart from "./Pages/Cart";
 import Checkout from "./Pages/Checkout";
 import { LoginSignup } from "./Pages/LoginSignup";
 import Wishlist from "./Pages/Wishlist";
+import Orders from "./Pages/Orders";
 import Footer from "./Components/Footer/Footer";
 import men_banner from "./Assets/banner_mens.png";
 import women_banner from "./Assets/banner_women.png";
@@ -41,6 +42,7 @@ function App() {
           </Route>
           <Route path="/cart" element={<Cart />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<LoginSignup />} />
         </Routes>
