@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useContext } from "react";
 import { ShopContext } from "../Context/ShopContext";
 import { axiosInstance } from "../lib/axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import "./CSS/Checkout.css";
 
 const Checkout = () => {
-  const { all_product, cartItems, getTotalcartAmount } =
+  const { all_product, cartItems, getTotalcartAmount, refreshCart } =
     useContext(ShopContext);
+  const navigate = useNavigate();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [placingOrder, setPlacingOrder] = useState(false);
   const [newAddress, setNewAddress] = useState({
     fullName: "",
     phone: "",
@@ -23,7 +27,7 @@ const Checkout = () => {
 
   // Get cart items for display
   const cartProducts = all_product.filter(
-    (product) => cartItems[product.id] > 0
+    (product) => cartItems[product.id] > 0,
   );
 
   useEffect(() => {
@@ -42,7 +46,7 @@ const Checkout = () => {
         setAddresses(response.data.addresses);
         // Auto-select default address if available
         const defaultAddress = response.data.addresses.find(
-          (addr) => addr.isDefault
+          (addr) => addr.isDefault,
         );
         if (defaultAddress) {
           setSelectedAddress(defaultAddress._id);
@@ -50,7 +54,7 @@ const Checkout = () => {
       }
     } catch (error) {
       console.error("Error fetching addresses:", error);
-      alert("Error fetching addresses. Please try again.");
+      toast.error("Error fetching addresses. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +71,7 @@ const Checkout = () => {
           headers: {
             "auth-token": localStorage.getItem("auth-token"),
           },
-        }
+        },
       );
 
       if (response.data.success) {
@@ -83,11 +87,11 @@ const Checkout = () => {
           country: "India",
           isDefault: false,
         });
-        alert("Address added successfully!");
+        toast.success("Address added successfully!");
       }
     } catch (error) {
       console.error("Error adding address:", error);
-      alert("Error adding address. Please try again.");
+      toast.error("Error adding address. Please try again.");
     }
   };
 
@@ -99,16 +103,46 @@ const Checkout = () => {
     }));
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     if (!selectedAddress) {
-      alert("Please select a delivery address");
+      toast.error("Please select a delivery address");
       return;
     }
 
-    // Here you would typically integrate with a payment gateway
-    // For now, we'll just show a success message
-    alert("Order placed successfully! Redirecting to payment...");
-    // You can add order processing logic here
+    setPlacingOrder(true);
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/orders/create",
+        {
+          addressId: selectedAddress,
+          paymentMethod: "COD", // You can make this dynamic later
+        },
+        {
+          headers: {
+            "auth-token": localStorage.getItem("auth-token"),
+          },
+        },
+      );
+
+      if (response.data.success) {
+        toast.success("Order placed successfully!");
+        // Refresh cart to clear it
+        await refreshCart();
+        // Redirect to orders page after a brief delay
+        setTimeout(() => {
+          navigate("/orders");
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to place order. Please try again.",
+      );
+    } finally {
+      setPlacingOrder(false);
+    }
   };
 
   if (loading) {
@@ -316,9 +350,11 @@ const Checkout = () => {
             <button
               className="place-order-btn"
               onClick={handlePlaceOrder}
-              disabled={!selectedAddress || cartProducts.length === 0}
+              disabled={
+                !selectedAddress || cartProducts.length === 0 || placingOrder
+              }
             >
-              Place Order
+              {placingOrder ? "Placing Order..." : "Place Order"}
             </button>
           </div>
         </div>
