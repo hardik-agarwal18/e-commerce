@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { axiosInstance } from "../lib/axios";
+import { toast } from "sonner";
 
 export const ShopContext = createContext(null);
 
@@ -13,6 +14,7 @@ const getDefaultCart = () => {
 const ShopContextProvider = (props) => {
   const [all_product, setAllProduct] = useState([]);
   const [cartItems, setCartItems] = useState(getDefaultCart());
+  const [wishlistItems, setWishlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,8 +49,32 @@ const ShopContextProvider = (props) => {
       }
     };
 
+    const fetchWishlistData = async () => {
+      if (localStorage.getItem("auth-token")) {
+        try {
+          const response = await axiosInstance.get(
+            "/api/user/get-wishlist-items",
+            {
+              headers: {
+                "auth-token": localStorage.getItem("auth-token"),
+              },
+            },
+          );
+          if (response.data.wishlist) {
+            const productIds = response.data.wishlist.products.map(
+              (item) => item.productId._id || item.productId,
+            );
+            setWishlistItems(productIds);
+          }
+        } catch (error) {
+          console.error("Error fetching wishlist data:", error);
+        }
+      }
+    };
+
     fetchProducts();
     fetchCartData();
+    fetchWishlistData();
   }, []);
 
   const addToCart = async (itemId, size = null) => {
@@ -167,6 +193,74 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  const addToWishlist = async (productId) => {
+    if (!localStorage.getItem("auth-token")) {
+      toast.error("Please login to add items to wishlist");
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/user/add-to-wishlist",
+        { productId },
+        {
+          headers: {
+            "auth-token": localStorage.getItem("auth-token"),
+          },
+        },
+      );
+
+      if (response.data.message) {
+        // Update local state
+        setWishlistItems((prev) => {
+          if (!prev.includes(productId)) {
+            toast.success("Item added to wishlist");
+            return [...prev, productId];
+          }
+          return prev;
+        });
+      }
+    } catch (error) {
+      console.error("Error adding to wishlist:", error);
+      toast.error("Failed to add item to wishlist");
+    }
+  };
+
+  const removeFromWishlist = async (productId) => {
+    if (!localStorage.getItem("auth-token")) {
+      return;
+    }
+
+    try {
+      const response = await axiosInstance.post(
+        "/api/user/remove-from-wishlist",
+        { productId },
+        {
+          headers: {
+            "auth-token": localStorage.getItem("auth-token"),
+          },
+        },
+      );
+
+      if (response.data.message) {
+        // Update local state
+        setWishlistItems((prev) => prev.filter((id) => id !== productId));
+        toast.success("Item removed from wishlist");
+      }
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove item from wishlist");
+    }
+  };
+
+  const isInWishlist = (productId) => {
+    return wishlistItems.includes(productId);
+  };
+
+  const getWishlistCount = () => {
+    return wishlistItems.length;
+  };
+
   const contextValue = {
     getTotalCartItems, // Added this function to get total number of items in cart
     getTotalcartAmount, // Added this function to get Total Price
@@ -176,6 +270,11 @@ const ShopContextProvider = (props) => {
     removeFromCart,
     refreshCart, // Added function to refresh cart data
     loading, // Added loading state
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
+    isInWishlist,
+    getWishlistCount,
   };
   return (
     <ShopContext.Provider value={contextValue}>

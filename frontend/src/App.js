@@ -8,15 +8,18 @@ import Product from "./Pages/Product";
 import Cart from "./Pages/Cart";
 import Checkout from "./Pages/Checkout";
 import { LoginSignup } from "./Pages/LoginSignup";
+import Wishlist from "./Pages/Wishlist";
 import Footer from "./Components/Footer/Footer";
 import men_banner from "./Assets/banner_mens.png";
 import women_banner from "./Assets/banner_women.png";
 import kid_banner from "./Assets/banner_kids.png";
+import { Toaster } from "sonner";
 
 // App component to display the website layout and routes.
 function App() {
   return (
     <div>
+      <Toaster position="top-right" richColors />
       <BrowserRouter>
         <Navbar />
         <Routes>
@@ -37,6 +40,7 @@ function App() {
             <Route path=":productId" element={<Product />} />
           </Route>
           <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/login" element={<LoginSignup />} />
         </Routes>

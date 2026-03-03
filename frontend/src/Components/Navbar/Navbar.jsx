@@ -7,15 +7,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../../Context/ShopContext";
 import nav_dropdown from "../../Assets/nav_dropdown.png";
 import { axiosInstance } from "../../lib/axios";
+import { toast } from "sonner";
 
 //Navbar component to display the website logo and navigation links.
 const Navbar = () => {
   const [menu, setMenu] = useState("shop");
-  const { getTotalCartItems } = useContext(ShopContext);
+  const { getTotalCartItems, getWishlistCount } = useContext(ShopContext);
   const menuRef = useRef();
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("auth-token");
   const cartItemCount = getTotalCartItems();
+  const wishlistCount = getWishlistCount();
 
   const dropdown_toggle = (e) => {
     menuRef.current.classList.toggle("nav-menu-visible");
@@ -25,7 +27,15 @@ const Navbar = () => {
   const handleCartClick = (e) => {
     if (!isLoggedIn) {
       e.preventDefault();
-      // Show a subtle message or redirect to login
+      toast.error("Please login to view cart");
+      navigate("/login");
+    }
+  };
+
+  const handleWishlistClick = (e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      toast.error("Please login to view wishlist");
       navigate("/login");
     }
   };
@@ -110,8 +120,31 @@ const Navbar = () => {
           </Link>
         )}
         <Link
+          to={isLoggedIn ? "/wishlist" : "/login"}
+          className="wishlist-icon-container"
+          onClick={handleWishlistClick}
+          title={isLoggedIn ? "View Wishlist" : "Login to view wishlist"}
+        >
+          <svg
+            className="wishlist-icon"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill={wishlistCount > 0 ? "#ff4141" : "none"}
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+          {wishlistCount > 0 && (
+            <div className="nav-wishlist-badge">
+              {wishlistCount > 99 ? "99+" : wishlistCount}
+            </div>
+          )}
+        </Link>
+        <Link
           to={isLoggedIn ? "/cart" : "/login"}
-          className={`cart-icon-container ${!isLoggedIn ? "cart-disabled" : ""}`}
+          className="cart-icon-container"
           onClick={handleCartClick}
           title={isLoggedIn ? "View Cart" : "Login to view cart"}
         >

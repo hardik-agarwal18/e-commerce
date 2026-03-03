@@ -272,6 +272,111 @@
   }
 }
 
+/* Product Display Buttons */
+.productdisplay-buttons {
+  display: flex;
+  gap: 15px;
+  margin: 30px 0 40px 0;
+  flex-wrap: wrap;
+}
+
+.add-to-cart-btn,
+.wishlist-btn {
+  padding: 18px 48px;
+  min-width: 220px;
+  font-size: 16px;
+  font-weight: 700;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.add-to-cart-btn {
+  color: var(--white);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--primary-dark) 100%
+  );
+  box-shadow: 0 8px 24px rgba(255, 65, 65, 0.3);
+  flex: 1;
+}
+
+.add-to-cart-btn::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s ease,
+    height 0.6s ease;
+}
+
+.add-to-cart-btn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.add-to-cart-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 65, 65, 0.4);
+}
+
+.add-to-cart-btn:active {
+  transform: translateY(-2px);
+}
+
+.wishlist-btn {
+  color: #3d3d3d;
+  background: white;
+  border: 2px solid #e3e3e3;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.wishlist-btn svg {
+  transition: var(--transition);
+}
+
+.wishlist-btn:hover {
+  border-color: #ff4141;
+  color: #ff4141;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(255, 65, 65, 0.2);
+}
+
+.wishlist-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.wishlist-btn.in-wishlist {
+  background: rgba(255, 65, 65, 0.05);
+  border-color: #ff4141;
+  color: #ff4141;
+}
+
+.wishlist-btn.in-wishlist svg {
+  fill: #ff4141;
+}
+
+.wishlist-btn:active {
+  transform: translateY(-2px);
+}
+
+/* Legacy button styles for backward compatibility */
 .productdisplay-right button {
   padding: 18px 48px;
   min-width: 240px;
@@ -436,6 +541,15 @@
     width: 100%;
     max-width: 300px;
   }
+  .productdisplay-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .add-to-cart-btn,
+  .wishlist-btn {
+    width: 100%;
+    min-width: 100%;
+  }
 }
 
 @media (max-width: 500px) {
@@ -487,6 +601,11 @@
     padding: 16px 32px;
     font-size: 14px;
     margin-bottom: 30px;
+  }
+  .add-to-cart-btn,
+  .wishlist-btn {
+    padding: 16px 32px;
+    font-size: 14px;
   }
   .productdisplay-right-category {
     font-size: 14px;
