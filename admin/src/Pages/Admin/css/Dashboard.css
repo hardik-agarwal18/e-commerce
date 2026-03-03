@@ -89,6 +89,106 @@
   font-size: 28px;
 }
 
+/* Order Statistics Section */
+.dashboard-orders-section {
+  margin-top: 40px;
+}
+
+.dashboard-orders-section h2 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.order-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.order-stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: all 0.3s ease;
+  border-top: 4px solid;
+}
+
+.order-stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.order-stat-card h3 {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.order-stat-card .stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.order-stat-card.pending {
+  border-top-color: #f39c12;
+}
+
+.order-stat-card.pending .stat-number {
+  color: #f39c12;
+}
+
+.order-stat-card.processing {
+  border-top-color: #3498db;
+}
+
+.order-stat-card.processing .stat-number {
+  color: #3498db;
+}
+
+.order-stat-card.shipped {
+  border-top-color: #9b59b6;
+}
+
+.order-stat-card.shipped .stat-number {
+  color: #9b59b6;
+}
+
+.order-stat-card.delivered {
+  border-top-color: #27ae60;
+}
+
+.order-stat-card.delivered .stat-number {
+  color: #27ae60;
+}
+
+.order-stat-card.cancelled {
+  border-top-color: #e74c3c;
+}
+
+.order-stat-card.cancelled .stat-number {
+  color: #e74c3c;
+}
+
+.order-stat-card.revenue {
+  border-top-color: #16a085;
+  grid-column: span 1;
+}
+
+.order-stat-card.revenue .stat-number {
+  color: #16a085;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .dashboard {
@@ -125,6 +225,16 @@
   .stat-card p {
     font-size: 1.6rem;
   }
+  .dashboard-orders-section h2 {
+    font-size: 22px;
+  }
+  .order-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  .order-stat-card {
+    padding: 18px;
+  }
 }
 
 @media (max-width: 500px) {
@@ -148,6 +258,23 @@
     font-size: 0.95rem;
     margin-bottom: 8px;
   }
+  .stat-card p {
+    font-size: 1.4rem;
+  }
+  .dashboard-orders-section h2 {
+    font-size: 18px;
+  }
+  .order-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .order-stat-card {
+    padding: 15px;
+  }
+  .order-stat-card .stat-number {
+    font-size: 24px;
+  }
+}
   .stat-card p {
     font-size: 1.4rem;
   }
