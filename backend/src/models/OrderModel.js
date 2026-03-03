@@ -35,6 +35,11 @@ const orderSchema = new mongoose.Schema(
       ref: "Address",
       required: true,
     },
+    paymentMethod: {
+      type: String,
+      default: "COD",
+      enum: ["COD", "Card", "UPI", "NetBanking"],
+    },
     status: {
       type: String,
       default: "pending",
@@ -43,7 +48,7 @@ const orderSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Order = mongoose.model("Order", orderSchema);
