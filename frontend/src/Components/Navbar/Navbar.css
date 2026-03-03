@@ -172,6 +172,72 @@
   transform: translateY(0);
 }
 
+/* Wishlist Icon Styles */
+.wishlist-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.wishlist-icon-container:hover {
+  background: rgba(255, 65, 65, 0.05);
+  transform: translateY(-2px);
+}
+
+.wishlist-icon-container.wishlist-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.wishlist-icon-container.wishlist-disabled:hover {
+  background: transparent;
+  transform: none;
+}
+
+.wishlist-icon {
+  width: 24px;
+  height: 24px;
+  transition: var(--transition);
+  color: #3d3d3d;
+}
+
+.wishlist-icon-container:hover .wishlist-icon {
+  transform: scale(1.1);
+  color: #ff4141;
+}
+
+.wishlist-icon-container.wishlist-disabled:hover .wishlist-icon {
+  transform: none;
+  color: #3d3d3d;
+}
+
+.nav-wishlist-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  background: linear-gradient(135deg, #ff4141 0%, #e53e3e 100%);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 9px;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(255, 65, 65, 0.4);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Cart Icon Styles */
 .cart-icon-container {
   position: relative;
   display: flex;
