@@ -94,3 +94,102 @@ export const popularInWomen = async (req, res) => {
     return res.status(200).json({ popularinwomen });
   }
 };
+
+export const updateProduct = async (req, res) => {
+  try {
+    const {
+      id,
+      name,
+      image,
+      category,
+      new_price,
+      old_price,
+      stock,
+      sizeStock,
+    } = req.body;
+
+    // Validate that id is provided
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID is required",
+      });
+    }
+
+    // Find the product by id
+    const product = await Product.findOne({ id });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // Calculate total stock from sizeStock if provided
+    let totalStock = stock || product.stock;
+    if (sizeStock) {
+      totalStock = Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0);
+    }
+
+    // Update fields
+    if (name !== undefined) product.name = name;
+    if (image !== undefined) product.image = image;
+    if (category !== undefined) product.category = category;
+    if (new_price !== undefined) product.new_price = new_price;
+    if (old_price !== undefined) product.old_price = old_price;
+    if (sizeStock !== undefined) product.sizeStock = sizeStock;
+
+    product.stock = totalStock;
+    product.available = totalStock > 0;
+
+    await product.save();
+
+    res.json({
+      success: true,
+      message: "Product Updated Successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const parsedId = parseInt(id);
+
+    // Validate that id is a valid number
+    if (isNaN(parsedId)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    const product = await Product.findOne({ id: parsedId });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};

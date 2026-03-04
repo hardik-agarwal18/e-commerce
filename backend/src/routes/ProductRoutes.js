@@ -5,6 +5,8 @@ import {
   getAllProducts,
   newCollection,
   popularInWomen,
+  updateProduct,
+  getProductById,
 } from "../controllers/ProductController.js";
 
 import { isSignedIn } from "../middleware/auth.js";
@@ -14,8 +16,12 @@ const router = express.Router();
 
 //Get All Products
 router.get("/getallproducts", getAllProducts);
+//Get Product by ID
+router.get("/product/:id", getProductById);
 //Add Product
 router.post("/addproduct", isSignedIn, isAdmin, addProduct);
+//Update Product
+router.put("/updateproduct", isSignedIn, isAdmin, updateProduct);
 //Remove Product
 router.post("/removeproduct", isSignedIn, isAdmin, deleteProduct);
 // Creating endpoint for new collection
