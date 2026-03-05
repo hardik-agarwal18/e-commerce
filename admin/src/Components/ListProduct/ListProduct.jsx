@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ListProduct.css";
 import cross_icon from "../../assets/cross_icon.png";
 import { axiosInstance } from "../../lib/axios";
 
 const ListProduct = () => {
+  const navigate = useNavigate();
   const [allProducts, setAllProducts] = useState([]);
   const [expandedProduct, setExpandedProduct] = useState(null);
 
@@ -42,6 +44,11 @@ const ListProduct = () => {
   const toggleStockDetails = (productId) => {
     setExpandedProduct(expandedProduct === productId ? null : productId);
   };
+
+  const editProduct = (productId) => {
+    navigate(`/editproduct/${productId}`);
+  };
+
   return (
     <div className="list-product">
       <h1>All Products List</h1>
@@ -52,16 +59,16 @@ const ListProduct = () => {
         <p>New Price</p>
         <p>Category</p>
         <p>Stock</p>
-        <p>Remove</p>
+        <p>Actions</p>
       </div>
       <div className="listproduct-allproducts">
         <hr />
         {allProducts.map((product, index) => {
           const totalStock = getTotalStock(product);
-          const isExpanded = expandedProduct === product.id;
+          const isExpanded = expandedProduct === product._id;
 
           return (
-            <div key={index}>
+            <div key={product._id}>
               <div className="listproduct-format-main listproduct-format">
                 <img
                   src={product.image}
@@ -76,7 +83,7 @@ const ListProduct = () => {
                   <span
                     className={`stock-badge ${totalStock <= 5 ? "low-stock" : ""} ${totalStock === 0 ? "out-of-stock" : ""}`}
                     onClick={() =>
-                      product.sizeStock && toggleStockDetails(product.id)
+                      product.sizeStock && toggleStockDetails(product._id)
                     }
                     style={{
                       cursor: product.sizeStock ? "pointer" : "default",
@@ -85,19 +92,38 @@ const ListProduct = () => {
                     {totalStock}
                     {product.sizeStock && (
                       <span className="expand-icon">
-                        {isExpanded ? "▲" : "▼"}
+                        {isExpanded ? "▼" : "▶"}
                       </span>
                     )}
                   </span>
                 </div>
-                <img
-                  onClick={() => {
-                    remove_product(product.id);
-                  }}
-                  src={cross_icon}
-                  alt=""
-                  className="listproduct-remove-icon"
-                />
+                <div className="listproduct-actions">
+                  <button
+                    className="listproduct-edit-btn"
+                    onClick={() => editProduct(product._id)}
+                    title="Edit Product"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25ZM20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    className="listproduct-delete-btn"
+                    onClick={() => remove_product(product._id)}
+                    title="Delete Product"
+                  >
+                    <img src={cross_icon} alt="Delete" />
+                  </button>
+                </div>
               </div>
               {isExpanded && product.sizeStock && (
                 <div className="size-stock-details">

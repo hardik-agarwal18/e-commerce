@@ -26,7 +26,7 @@
 
 .listproduct-format-main {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 1fr 1fr 100px 80px;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 100px 100px;
   gap: 20px;
   width: 100%;
   padding: 20px 25px;
@@ -41,7 +41,7 @@
 
 .listproduct-format {
   display: grid;
-  grid-template-columns: 80px 2fr 1fr 1fr 1fr 100px 80px;
+  grid-template-columns: 80px 2fr 1fr 1fr 1fr 100px 100px;
   gap: 20px;
   width: 100%;
   padding: 20px 25px;
@@ -77,6 +77,59 @@
 .listproduct-product-icon:hover {
   transform: scale(1.1);
   border-color: #667eea;
+}
+
+.listproduct-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.listproduct-edit-btn,
+.listproduct-delete-btn {
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.listproduct-edit-btn {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.listproduct-edit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.listproduct-delete-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+  padding: 6px;
+}
+
+.listproduct-delete-btn img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) invert(1);
+}
+
+.listproduct-delete-btn:hover {
+  transform: translateY(-2px) rotate(90deg);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.listproduct-actions button:active {
+  transform: translateY(0);
 }
 
 .listproduct-remove-icon {
@@ -278,18 +331,34 @@
     margin-bottom: 15px;
   }
   .listproduct-format-main {
-    grid-template-columns: 50px 1.5fr 0.8fr 0.8fr 0.8fr 70px 35px;
+    grid-template-columns: 50px 1.5fr 0.8fr 0.8fr 0.8fr 70px 80px;
     padding: 12px 5px;
     font-size: 11px;
     gap: 5px;
+  }
+  .listproduct-format {
+    grid-template-columns: 50px 1.5fr 0.8fr 0.8fr 0.8fr 70px 80px;
   }
   .listproduct-product-icon {
     height: 45px;
     width: 45px;
   }
-  .listproduct-remove-icon {
-    width: 18px;
-    height: 18px;
+  .listproduct-edit-btn,
+  .listproduct-delete-btn {
+    width: 32px;
+    height: 32px;
+    padding: 6px;
+  }
+  .listproduct-edit-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .listproduct-delete-btn img {
+    width: 16px;
+    height: 16px;
+  }
+  .listproduct-actions {
+    gap: 6px;
   }
   .listproduct-allproducts {
     max-height: 500px;
@@ -321,10 +390,13 @@
     margin-bottom: 12px;
   }
   .listproduct-format-main {
-    grid-template-columns: 40px 1.2fr 0.7fr 0.7fr 50px 30px;
+    grid-template-columns: 40px 1.2fr 0.7fr 0.7fr 50px 70px;
     padding: 10px 3px;
     font-size: 10px;
     gap: 3px;
+  }
+  .listproduct-format {
+    grid-template-columns: 40px 1.2fr 0.7fr 0.7fr 50px 70px;
   }
   .listproduct-format-main p:nth-child(4) {
     display: none;
@@ -336,9 +408,23 @@
     height: 35px;
     width: 35px;
   }
-  .listproduct-remove-icon {
-    width: 16px;
-    height: 16px;
+  .listproduct-edit-btn,
+  .listproduct-delete-btn {
+    width: 28px;
+    height: 28px;
+    padding: 5px;
+  }
+  .listproduct-edit-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  .listproduct-delete-btn img {
+    width: 14px;
+    height: 14px;
+  }
+  .listproduct-actions {
+    gap: 4px;
+    flex-direction: column;
   }
   .listproduct-allproducts {
     max-height: 400px;

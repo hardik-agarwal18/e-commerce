@@ -1,0 +1,351 @@
+.edit-product {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 900px;
+  padding: 40px 50px;
+  margin: 30px auto;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.edit-product h1 {
+  font-size: 32px;
+  margin-bottom: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.edit-product.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+}
+
+.spinner-large {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(102, 126, 234, 0.2);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container p {
+  color: #718096;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.editproduct-itemfield {
+  width: 100%;
+  color: #4a5568;
+  font-size: 15px;
+  margin-bottom: 25px;
+}
+
+.editproduct-itemfield p,
+.editproduct-itemfield label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #2d3748;
+  letter-spacing: 0.3px;
+}
+
+.editproduct-itemfield input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 54px;
+  border-radius: 12px;
+  padding: 0 20px;
+  border: 2px solid #e2e8f0;
+  outline: none;
+  color: #2d3748;
+  font-family: "Poppins";
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: #f8f9ff;
+}
+
+.editproduct-itemfield input:focus {
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.editproduct-itemfield input::placeholder {
+  color: #a0aec0;
+}
+
+.editproduct-price {
+  display: flex;
+  gap: 25px;
+}
+
+.edit-product-selector {
+  padding: 15px 20px;
+  width: 100%;
+  height: 54px;
+  font-size: 15px;
+  color: #2d3748;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8f9ff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.edit-product-selector:focus {
+  border-color: #667eea;
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.editproduct-thumbnail-img {
+  height: 180px;
+  width: 180px;
+  border-radius: 16px;
+  object-fit: cover;
+  margin: 15px 0;
+  border: 3px solid #e2e8f0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.editproduct-thumbnail-img:hover {
+  transform: scale(1.05);
+  border-color: #667eea;
+}
+
+.image-note {
+  font-size: 13px;
+  color: #718096;
+  font-style: italic;
+  margin-top: 8px;
+}
+
+.size-stock-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.size-stock-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.size-stock-item label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #667eea;
+  text-align: center;
+  margin: 0;
+  padding: 8px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+}
+
+.size-stock-item input {
+  height: 50px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  color: #2d3748;
+  background: #f8f9ff;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+.size-stock-item input:focus {
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  outline: none;
+}
+
+.size-stock-item input::-webkit-inner-spin-button,
+.size-stock-item input::-webkit-outer-spin-button {
+  opacity: 1;
+  height: 40px;
+}
+
+.total-stock-info {
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  border-radius: 10px;
+  font-weight: 600;
+  color: #667eea;
+  text-align: center;
+  border: 2px solid #667eea30;
+  font-size: 15px;
+  margin-bottom: 0;
+}
+
+.editproduct-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.editproduct-button {
+  height: 54px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex: 1;
+}
+
+.editproduct-button.update {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.editproduct-button.update:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.editproduct-button.update:active {
+  transform: translateY(-1px);
+}
+
+.editproduct-button.cancel {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  flex: 0.6;
+}
+
+.editproduct-button.cancel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(127, 140, 141, 0.4);
+}
+
+.editproduct-button.cancel:active {
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .edit-product {
+    max-width: 95%;
+    padding: 35px 40px;
+  }
+
+  .size-stock-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .edit-product {
+    padding: 30px 25px;
+    margin: 20px auto;
+  }
+
+  .edit-product h1 {
+    font-size: 28px;
+  }
+
+  .editproduct-price {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .size-stock-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .editproduct-thumbnail-img {
+    height: 150px;
+    width: 150px;
+  }
+
+  .editproduct-actions {
+    flex-direction: column;
+  }
+
+  .editproduct-button.cancel {
+    flex: 1;
+  }
+}
+
+@media (max-width: 500px) {
+  .edit-product {
+    padding: 20px 15px;
+    margin: 15px;
+  }
+
+  .edit-product h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+
+  .editproduct-itemfield p {
+    font-size: 14px;
+  }
+
+  .editproduct-itemfield input,
+  .edit-product-selector {
+    height: 50px;
+    font-size: 14px;
+  }
+
+  .size-stock-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .size-stock-item label {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .size-stock-item input {
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .editproduct-thumbnail-img {
+    height: 120px;
+    width: 120px;
+  }
+
+  .editproduct-button {
+    height: 50px;
+    font-size: 14px;
+  }
+
+  .total-stock-info {
+    font-size: 14px;
+    padding: 10px 15px;
+  }
+}
