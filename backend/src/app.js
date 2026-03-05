@@ -49,7 +49,10 @@ app.use(
 app.use(morgan("dev"));
 
 // Database connection with mongodb
-connectDatabase();
+// Don't auto-connect in test environment - tests will manage connections
+if (process.env.NODE_ENV !== "test") {
+  connectDatabase();
+}
 
 // Api Creation
 app.get("/", (req, res) => {

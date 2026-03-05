@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import Users from "../src/models/UserModel.js";
 import Product from "../src/models/ProductModel.js";
 
@@ -27,7 +26,6 @@ describe("Analytics API", () => {
   afterAll(async () => {
     await Users.deleteMany({});
     await Product.deleteMany({});
-    await mongoose.connection.close();
   });
 
   describe("GET /api/analytics/user-count", () => {

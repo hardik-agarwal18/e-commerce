@@ -57,7 +57,6 @@ describe("Cart API", () => {
     await Users.deleteMany({});
     await Product.deleteMany({});
     await Cart.deleteMany({});
-    await mongoose.connection.close();
   });
 
   beforeEach(async () => {

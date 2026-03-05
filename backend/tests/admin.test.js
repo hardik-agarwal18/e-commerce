@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import Users from "../src/models/UserModel.js";
 
 describe("Admin API", () => {
@@ -23,9 +22,8 @@ describe("Admin API", () => {
   });
 
   afterAll(async () => {
-    // Clean up and close database connection
+    // Clean up test data
     await Users.deleteMany({});
-    await mongoose.connection.close();
   });
 
   describe("POST /api/admin/login", () => {
@@ -61,9 +59,7 @@ describe("Admin API", () => {
     });
 
     it("should return error for missing credentials", async () => {
-      const res = await request(app)
-        .post("/api/admin/login")
-        .send({});
+      const res = await request(app).post("/api/admin/login").send({});
 
       expect(res.statusCode).toBe(400);
       expect(res.body.success).toBe(false);

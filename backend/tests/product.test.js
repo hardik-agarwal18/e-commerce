@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import Product from "../src/models/ProductModel.js";
 
 describe("Product API", () => {
@@ -39,7 +38,6 @@ describe("Product API", () => {
 
   afterAll(async () => {
     await Product.deleteMany({});
-    await mongoose.connection.close();
   });
 
   describe("POST /api/products/addproduct", () => {

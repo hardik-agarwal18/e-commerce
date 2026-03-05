@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -29,7 +28,7 @@ describe("Upload API", () => {
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+    // Cleanup handled by setup file
   });
 
   describe("POST /api/upload", () => {

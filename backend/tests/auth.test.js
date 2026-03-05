@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import Users from "../src/models/UserModel.js";
 
 describe("Auth API", () => {
@@ -16,9 +15,8 @@ describe("Auth API", () => {
   });
 
   afterAll(async () => {
-    // Clean up and close database connection
+    // Clean up test data
     await Users.deleteMany({});
-    await mongoose.connection.close();
   });
 
   describe("POST /api/auth/signup", () => {

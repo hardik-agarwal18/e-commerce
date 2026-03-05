@@ -45,7 +45,7 @@ jobs:
         working-directory: ./backend
         run: npm test
         env:
-          MONGODB_KEY: mongodb://localhost:27017/test
+          MONGODB_TEST_KEY: mongodb://localhost:27017/test
           JWT_SECRET: test-secret-key
           NODE_ENV: test # Disables rate limiting for tests
 

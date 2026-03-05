@@ -44,7 +44,6 @@ describe("Address API", () => {
   afterAll(async () => {
     await Users.deleteMany({});
     await Address.deleteMany({});
-    await mongoose.connection.close();
   });
 
   describe("POST /api/user/add-address", () => {
