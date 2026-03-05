@@ -4,15 +4,6 @@ export const addProduct = async (req, res) => {
   const { name, image, category, new_price, old_price, stock, sizeStock } =
     req.body;
 
-  let products = await Product.find({});
-  let id;
-  if (products.length > 0) {
-    let last_product_array = products.slice(-1);
-    id = last_product_array[0].id + 1; // last product's id
-  } else {
-    id = 1;
-  }
-
   // Calculate total stock from sizeStock if provided, otherwise use stock
   let totalStock = stock || 0;
   if (sizeStock) {
@@ -20,7 +11,6 @@ export const addProduct = async (req, res) => {
   }
 
   const product = new Product({
-    id: id,
     name: name,
     image: image,
     category: category,
@@ -50,7 +40,7 @@ export const addProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.body;
-    const product = await Product.findOneAndDelete({ id });
+    const product = await Product.findByIdAndDelete(id);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -116,8 +106,8 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // Find the product by id
-    const product = await Product.findOne({ id });
+    // Find the product by MongoDB _id
+    const product = await Product.findById(id);
 
     if (!product) {
       return res.status(404).json({
@@ -162,17 +152,9 @@ export const updateProduct = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const parsedId = parseInt(id);
 
-    // Validate that id is a valid number
-    if (isNaN(parsedId)) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    const product = await Product.findOne({ id: parsedId });
+    // Use MongoDB's findById
+    const product = await Product.findById(id);
 
     if (!product) {
       return res.status(404).json({

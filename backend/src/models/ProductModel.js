@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 
 const Product = mongoose.model("Product", {
-  id: {
-    type: Number,
-    required: true,
-  },
   name: {
     type: String,
     required: true,

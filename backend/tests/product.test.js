@@ -57,11 +57,11 @@ describe("Product API", () => {
       const products = await Product.find({});
       expect(products).toHaveLength(1);
       expect(products[0].name).toBe(testProduct.name);
-      expect(products[0].id).toBe(1);
+      expect(products[0]._id).toBeDefined();
       expect(products[0].available).toBe(true);
     });
 
-    it("should auto-increment product id", async () => {
+    it("should create products with unique MongoDB IDs", async () => {
       // Add first product
       await request(app)
         .post("/api/products/addproduct")
@@ -80,10 +80,11 @@ describe("Product API", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
 
-      const products = await Product.find({}).sort({ id: 1 });
+      const products = await Product.find({});
       expect(products).toHaveLength(2);
-      expect(products[0].id).toBe(1);
-      expect(products[1].id).toBe(2);
+      expect(products[0]._id).toBeDefined();
+      expect(products[1]._id).toBeDefined();
+      expect(products[0]._id.toString()).not.toBe(products[1]._id.toString());
     });
 
     it("should set available to true when stock is greater than 0", async () => {
@@ -126,7 +127,7 @@ describe("Product API", () => {
         .send(testProduct);
 
       const product = await Product.findOne({ name: testProduct.name });
-      productId = product.id;
+      productId = product._id.toString();
     });
 
     it("should remove product successfully", async () => {
@@ -141,7 +142,7 @@ describe("Product API", () => {
       expect(res.body.name).toBe(testProduct.name);
 
       // Verify product was removed
-      const product = await Product.findOne({ id: productId });
+      const product = await Product.findById(productId);
       expect(product).toBeNull();
     });
 
@@ -149,7 +150,7 @@ describe("Product API", () => {
       const res = await request(app)
         .post("/api/products/removeproduct")
         .set("auth-token", adminToken)
-        .send({ id: 9999 });
+        .send({ id: "507f1f77bcf86cd799439011" }); // Valid MongoDB ObjectId format
 
       expect(res.statusCode).toBe(404);
       expect(res.body.success).toBe(false);
@@ -497,7 +498,7 @@ describe("Product API", () => {
       expect(res.body.product.old_price).toBe(updatedData.old_price);
 
       // Verify in database
-      const product = await Product.findOne({ id: productId });
+      const product = await Product.findById(productId);
       expect(product.name).toBe(updatedData.name);
       expect(product.image).toBe(updatedData.image);
     });
@@ -517,7 +518,7 @@ describe("Product API", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
 
-      const product = await Product.findOne({ id: productId });
+      const product = await Product.findById(productId);
       expect(product.name).toBe(updatedData.name);
       expect(product.new_price).toBe(updatedData.new_price);
       // Old fields should remain unchanged
@@ -545,7 +546,7 @@ describe("Product API", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
 
-      const product = await Product.findOne({ id: productId });
+      const product = await Product.findById(productId);
       expect(product.stock).toBe(50); // 10+15+20+5+0
       expect(product.available).toBe(true);
 
@@ -578,17 +579,17 @@ describe("Product API", () => {
 
       expect(res.statusCode).toBe(200);
 
-      const product = await Product.findOne({ id: productId });
+      const product = await Product.findById(productId);
       expect(product.stock).toBe(0);
       expect(product.available).toBe(false);
     });
 
     it("should set availability to true when updating from zero to positive stock", async () => {
       // First set stock to zero
-      await Product.findOneAndUpdate(
-        { id: productId },
-        { stock: 0, available: false },
-      );
+      await Product.findByIdAndUpdate(productId, {
+        stock: 0,
+        available: false,
+      });
 
       const updatedData = {
         id: productId,
@@ -602,14 +603,14 @@ describe("Product API", () => {
 
       expect(res.statusCode).toBe(200);
 
-      const product = await Product.findOne({ id: productId });
+      const product = await Product.findById(productId);
       expect(product.stock).toBe(25);
       expect(product.available).toBe(true);
     });
 
     it("should return 404 for non-existent product", async () => {
       const updatedData = {
-        id: 99999,
+        id: "507f1f77bcf86cd799439011", // Valid MongoDB ObjectId that doesn't exist
         name: "Non-existent Product",
       };
 
@@ -671,7 +672,7 @@ describe("Product API", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.product).toBeDefined();
-      expect(res.body.product.id).toBe(productId);
+      expect(res.body.product._id).toBe(productId);
       expect(res.body.product.name).toBe(testProduct.name);
       expect(res.body.product.category).toBe(testProduct.category);
       expect(res.body.product.new_price).toBe(testProduct.new_price);
@@ -702,7 +703,9 @@ describe("Product API", () => {
 
       const product = await Product.findOne({ name: productWithSizes.name });
 
-      const res = await request(app).get(`/api/products/product/${product.id}`);
+      const res = await request(app).get(
+        `/api/products/product/${product._id}`,
+      );
 
       expect(res.statusCode).toBe(200);
       expect(res.body.product.sizeStock).toBeDefined();
@@ -711,7 +714,9 @@ describe("Product API", () => {
     });
 
     it("should return 404 for non-existent product id", async () => {
-      const res = await request(app).get(`/api/products/product/99999`);
+      const res = await request(app).get(
+        `/api/products/product/507f1f77bcf86cd799439011`,
+      ); // Valid MongoDB ObjectId format
 
       expect(res.statusCode).toBe(404);
       expect(res.body.success).toBe(false);
@@ -738,7 +743,7 @@ describe("Product API", () => {
       expect(res.statusCode).toBe(200);
       expect(res.body).toHaveProperty("success");
       expect(res.body).toHaveProperty("product");
-      expect(res.body.product).toHaveProperty("id");
+      expect(res.body.product).toHaveProperty("_id");
       expect(res.body.product).toHaveProperty("name");
       expect(res.body.product).toHaveProperty("image");
       expect(res.body.product).toHaveProperty("category");
