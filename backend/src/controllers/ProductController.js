@@ -4,15 +4,6 @@ export const addProduct = async (req, res) => {
   const { name, image, category, new_price, old_price, stock, sizeStock } =
     req.body;
 
-  let products = await Product.find({});
-  let id;
-  if (products.length > 0) {
-    let last_product_array = products.slice(-1);
-    id = last_product_array[0].id + 1; // last product's id
-  } else {
-    id = 1;
-  }
-
   // Calculate total stock from sizeStock if provided, otherwise use stock
   let totalStock = stock || 0;
   if (sizeStock) {
@@ -20,7 +11,6 @@ export const addProduct = async (req, res) => {
   }
 
   const product = new Product({
-    id: id,
     name: name,
     image: image,
     category: category,
@@ -50,7 +40,7 @@ export const addProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.body;
-    const product = await Product.findOneAndDelete({ id });
+    const product = await Product.findByIdAndDelete(id);
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -92,5 +82,96 @@ export const popularInWomen = async (req, res) => {
   let popularinwomen = products.slice(1).slice(-4);
   if (popularinwomen) {
     return res.status(200).json({ popularinwomen });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const {
+      id,
+      name,
+      image,
+      category,
+      new_price,
+      old_price,
+      stock,
+      sizeStock,
+    } = req.body;
+
+    // Validate that id is provided
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Product ID is required",
+      });
+    }
+
+    // Find the product by MongoDB _id
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // Calculate total stock from sizeStock if provided
+    let totalStock = stock || product.stock;
+    if (sizeStock) {
+      totalStock = Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0);
+    }
+
+    // Update fields
+    if (name !== undefined) product.name = name;
+    if (image !== undefined) product.image = image;
+    if (category !== undefined) product.category = category;
+    if (new_price !== undefined) product.new_price = new_price;
+    if (old_price !== undefined) product.old_price = old_price;
+    if (sizeStock !== undefined) product.sizeStock = sizeStock;
+
+    product.stock = totalStock;
+    product.available = totalStock > 0;
+
+    await product.save();
+
+    res.json({
+      success: true,
+      message: "Product Updated Successfully",
+      product,
+    });
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Use MongoDB's findById
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      product,
+    });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };

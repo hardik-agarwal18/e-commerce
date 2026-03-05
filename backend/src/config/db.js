@@ -5,8 +5,19 @@ dotenv.config();
 
 const connectDatabase = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_KEY);
-    console.log("✅ MongoDB connected successfully.");
+    // Use test database when NODE_ENV is 'test'
+    const dbKey =
+      process.env.NODE_ENV === "test"
+        ? process.env.MONGODB_TEST_KEY
+        : process.env.MONGODB_KEY;
+
+    await mongoose.connect(dbKey);
+
+    if (process.env.NODE_ENV === "test") {
+      console.log("✅ MongoDB TEST database connected successfully.");
+    } else {
+      console.log("✅ MongoDB connected successfully.");
+    }
   } catch (error) {
     console.error("❌ MongoDB connection failed:", error.message);
     process.exit(1);
