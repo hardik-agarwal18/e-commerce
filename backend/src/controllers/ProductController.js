@@ -1,4 +1,5 @@
 import Product from "../models/ProductModel.js";
+import mongoose from "mongoose";
 
 export const addProduct = async (req, res) => {
   const { name, image, category, new_price, old_price, stock, sizeStock } =
@@ -152,6 +153,14 @@ export const updateProduct = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate MongoDB ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
 
     // Use MongoDB's findById
     const product = await Product.findById(id);
