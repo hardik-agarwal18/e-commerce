@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import Users from "../src/models/UserModel.js";
 import Address from "../src/models/AddressModel.js";
 
@@ -44,7 +43,6 @@ describe("Address API", () => {
   afterAll(async () => {
     await Users.deleteMany({});
     await Address.deleteMany({});
-    await mongoose.connection.close();
   });
 
   describe("POST /api/user/add-address", () => {

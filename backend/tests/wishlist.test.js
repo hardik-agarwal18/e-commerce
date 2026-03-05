@@ -1,6 +1,5 @@
 import request from "supertest";
 import app from "../src/app.js";
-import mongoose from "mongoose";
 import Users from "../src/models/UserModel.js";
 import Product from "../src/models/ProductModel.js";
 import WishList from "../src/models/WishListModel.js";
@@ -50,7 +49,6 @@ describe("Wishlist API", () => {
     await Users.deleteMany({});
     await Product.deleteMany({});
     await WishList.deleteMany({});
-    await mongoose.connection.close();
   });
 
   beforeEach(async () => {
