@@ -2,7 +2,9 @@ import Product from "../models/ProductModel.js";
 import mongoose from "mongoose";
 
 const serializeProduct = (product) => {
-  const doc = product?.toObject ? product.toObject() : product;
+  const doc = product?.toJSON
+    ? product.toJSON({ virtuals: true, flattenMaps: true })
+    : product;
   return {
     ...doc,
     id: doc?.id || doc?._id?.toString?.() || doc?._id,
