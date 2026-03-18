@@ -7,9 +7,19 @@ import ProductDisplay from "../Components/ProductDisplay/ProductDisplay";
 import RelatedProducts from "../Components/RelatedProducts/RelatedProducts";
 
 const Product = () => {
-  const { all_product } = useContext(ShopContext);
+  const { all_product, loading } = useContext(ShopContext);
   const { productId } = useParams();
-  const product = all_product.find((e) => e.id === Number(productId));
+  const product = all_product.find(
+    (e) => String(e.id || e._id) === String(productId),
+  );
+
+  if (loading) {
+    return <div>Loading product...</div>;
+  }
+
+  if (!product) {
+    return <div>Product not found.</div>;
+  }
 
   return (
     <div>

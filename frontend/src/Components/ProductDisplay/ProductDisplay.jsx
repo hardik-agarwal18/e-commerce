@@ -10,6 +10,11 @@ const ProductDisplay = (props) => {
     useContext(ShopContext);
   const [selectedSize, setSelectedSize] = useState("");
   const [sizeError, setSizeError] = useState("");
+
+  if (!product) {
+    return null;
+  }
+
   const inWishlist = isInWishlist(product.id);
 
   const sizes = ["S", "M", "L", "XL", "XXL"];

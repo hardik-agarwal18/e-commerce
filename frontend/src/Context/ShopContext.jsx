@@ -24,7 +24,13 @@ const ShopContextProvider = (props) => {
         const response = await axiosInstance.get(
           "/api/products/getallproducts",
         );
-        setAllProduct(response.data);
+        const products = Array.isArray(response.data)
+          ? response.data.map((product) => ({
+              ...product,
+              id: product.id || product._id,
+            }))
+          : [];
+        setAllProduct(products);
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
@@ -158,7 +164,7 @@ const ShopContextProvider = (props) => {
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
         let itemInfo = all_product.find((product) => {
-          return product.id === Number(item);
+          return String(product.id) === String(item);
         });
         if (itemInfo) totalAmount += itemInfo.new_price * cartItems[item];
       }

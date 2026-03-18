@@ -1,6 +1,14 @@
 import Product from "../models/ProductModel.js";
 import mongoose from "mongoose";
 
+const serializeProduct = (product) => {
+  const doc = product?.toObject ? product.toObject() : product;
+  return {
+    ...doc,
+    id: doc?.id || doc?._id?.toString?.() || doc?._id,
+  };
+};
+
 export const addProduct = async (req, res) => {
   const { name, image, category, new_price, old_price, stock, sizeStock } =
     req.body;
@@ -66,13 +74,13 @@ export const deleteProduct = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   let products = await Product.find({});
   // console.log("All Products Fetched");
-  res.send(products);
+  res.send(products.map(serializeProduct));
 };
 
 export const newCollection = async (req, res) => {
   let products = await Product.find({});
 
-  let newcollection = products.slice(1).slice(-8);
+  let newcollection = products.slice(1).slice(-8).map(serializeProduct);
   if (newcollection) {
     return res.status(200).json({ newcollection });
   }
@@ -80,7 +88,7 @@ export const newCollection = async (req, res) => {
 
 export const popularInWomen = async (req, res) => {
   const products = await Product.find({ category: "women" });
-  let popularinwomen = products.slice(1).slice(-4);
+  let popularinwomen = products.slice(1).slice(-4).map(serializeProduct);
   if (popularinwomen) {
     return res.status(200).json({ popularinwomen });
   }
@@ -174,7 +182,7 @@ export const getProductById = async (req, res) => {
 
     res.json({
       success: true,
-      product,
+      product: serializeProduct(product),
     });
   } catch (error) {
     console.error("Error fetching product:", error);

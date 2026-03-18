@@ -15,7 +15,7 @@ const Popular = () => {
       try {
         setLoading(true);
         const response = await axiosInstance.get(
-          "/api/products/popularinwomen"
+          "/api/products/popularinwomen",
         );
         if (response.data && response.data.popularinwomen) {
           setPopularProducts(response.data.popularinwomen);
@@ -43,7 +43,7 @@ const Popular = () => {
               return (
                 <Item
                   key={i}
-                  id={item.id}
+                  id={item.id || item._id}
                   name={item.name}
                   image={item.image}
                   new_price={item.new_price}
