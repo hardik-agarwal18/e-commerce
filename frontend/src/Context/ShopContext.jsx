@@ -17,6 +17,33 @@ const ShopContextProvider = (props) => {
   const [wishlistItems, setWishlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const normalizeCartData = (responseData) => {
+    const legacyCart = responseData?.cartData;
+    if (
+      legacyCart &&
+      typeof legacyCart === "object" &&
+      Object.keys(legacyCart).length > 0
+    ) {
+      return legacyCart;
+    }
+
+    const products = responseData?.cart?.products;
+    if (!Array.isArray(products)) {
+      return {};
+    }
+
+    return products.reduce((acc, item) => {
+      const productId =
+        item?.productId?._id || item?.productId?.id || item?.productId;
+      const quantity = Number(item?.quantity || 0);
+      if (productId && quantity > 0) {
+        const key = String(productId);
+        acc[key] = (acc[key] || 0) + quantity;
+      }
+      return acc;
+    }, {});
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -47,7 +74,7 @@ const ShopContextProvider = (props) => {
             },
           });
           if (response.data.success) {
-            setCartItems(response.data.cartData);
+            setCartItems(normalizeCartData(response.data));
           }
         } catch (error) {
           console.error("Error fetching cart data:", error);
@@ -85,7 +112,7 @@ const ShopContextProvider = (props) => {
 
   const addToCart = async (itemId, size = null) => {
     // Update local state
-    const cartKey = size ? `${itemId}_${size}` : itemId;
+    const cartKey = String(itemId);
     setCartItems((prev) => ({
       ...prev,
       [cartKey]: (prev[cartKey] || 0) + 1,
@@ -108,7 +135,7 @@ const ShopContextProvider = (props) => {
           },
         );
         if (response.data.success) {
-          console.log("Product added to cart successfully");
+          setCartItems(normalizeCartData(response.data));
         }
       } catch (error) {
         console.error("Error adding to cart:", error);
@@ -123,7 +150,7 @@ const ShopContextProvider = (props) => {
 
   const removeFromCart = async (itemId, size = null) => {
     // Update local state
-    const cartKey = size ? `${itemId}_${size}` : itemId;
+    const cartKey = String(itemId);
     setCartItems((prev) => ({
       ...prev,
       [cartKey]: Math.max((prev[cartKey] || 0) - 1, 0),
@@ -146,7 +173,7 @@ const ShopContextProvider = (props) => {
           },
         );
         if (response.data.success) {
-          console.log("Product removed from cart successfully");
+          setCartItems(normalizeCartData(response.data));
         }
       } catch (error) {
         console.error("Error removing from cart:", error);
@@ -191,7 +218,7 @@ const ShopContextProvider = (props) => {
           },
         });
         if (response.data.success) {
-          setCartItems(response.data.cartData);
+          setCartItems(normalizeCartData(response.data));
         }
       } catch (error) {
         console.error("Error refreshing cart:", error);
