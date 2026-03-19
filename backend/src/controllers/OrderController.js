@@ -1,6 +1,7 @@
 import Order from "../models/OrderModel.js";
 import Cart from "../models/CartModel.js";
 import Product from "../models/ProductModel.js";
+import Users from "../models/UserModel.js";
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -57,9 +58,11 @@ export const createOrder = async (req, res) => {
 
     await order.save();
 
-    // Clear the user's cart after successful order
-    cart.products = [];
-    await cart.save();
+    // Clear the user's cart after successful order in both cart stores
+    await Promise.all([
+      Cart.findOneAndDelete({ userId }),
+      Users.findByIdAndUpdate(userId, { cartData: {} }),
+    ]);
 
     res.status(201).json({
       success: true,

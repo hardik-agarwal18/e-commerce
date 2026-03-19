@@ -6,8 +6,13 @@ import { toast } from "sonner";
 import "./CSS/Checkout.css";
 
 const Checkout = () => {
-  const { all_product, cartItems, getTotalcartAmount, refreshCart } =
-    useContext(ShopContext);
+  const {
+    all_product,
+    cartItems,
+    getTotalcartAmount,
+    refreshCart,
+    clearLocalCart,
+  } = useContext(ShopContext);
   const navigate = useNavigate();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -127,6 +132,7 @@ const Checkout = () => {
 
       if (response.data.success) {
         toast.success("Order placed successfully!");
+        clearLocalCart();
         // Refresh cart to clear it
         await refreshCart();
         // Redirect to orders page after a brief delay

@@ -202,11 +202,16 @@ const ShopContextProvider = (props) => {
   const getTotalCartItems = () => {
     let totalItems = 0;
     for (const item in cartItems) {
-      if (cartItems[item] > 0) {
-        totalItems += cartItems[item];
+      const quantity = Number(cartItems[item]) || 0;
+      if (quantity > 0) {
+        totalItems += quantity;
       }
     }
     return totalItems;
+  };
+
+  const clearLocalCart = () => {
+    setCartItems({});
   };
 
   const refreshCart = async () => {
@@ -302,6 +307,7 @@ const ShopContextProvider = (props) => {
     addToCart,
     removeFromCart,
     refreshCart, // Added function to refresh cart data
+    clearLocalCart,
     loading, // Added loading state
     wishlistItems,
     addToWishlist,
