@@ -1,72 +1,45 @@
-import Product from "../models/ProductModel.js";
-import mongoose from "mongoose";
-
-const serializeProduct = (product) => {
-  const doc = product?.toJSON
-    ? product.toJSON({ virtuals: true, flattenMaps: true })
-    : product;
-  return {
-    ...doc,
-    id: doc?.id || doc?._id?.toString?.() || doc?._id,
-  };
-};
+import * as productService from "../services/product.service.js";
 
 export const addProduct = async (req, res) => {
-  const { name, image, category, new_price, old_price, stock, sizeStock } =
-    req.body;
+  try {
+    await productService.createProduct(req.body);
 
-  // Calculate total stock from sizeStock if provided, otherwise use stock
-  let totalStock = stock || 0;
-  if (sizeStock) {
-    totalStock = Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0);
+    return res.json({
+      success: true,
+      message: "Product Added",
+    });
+  } catch (error) {
+    console.error("Error adding product:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
-
-  const product = new Product({
-    name: name,
-    image: image,
-    category: category,
-    new_price: new_price,
-    old_price: old_price,
-    stock: totalStock,
-    sizeStock: sizeStock || {
-      S: 0,
-      M: 0,
-      L: 0,
-      XL: 0,
-      XXL: 0,
-    },
-    available: totalStock > 0,
-  });
-  // console.log(product);
-
-  await product.save();
-  // console.log("Saved");
-
-  res.json({
-    success: true,
-    message: "Product Added",
-  });
 };
 
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.body;
-    const product = await Product.findByIdAndDelete(id);
+
+    const product = await productService.removeProduct(id);
+
     if (!product) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
     }
-    // console.log("Removed the Product");
-    res.json({
+
+    return res.json({
       success: true,
       message: "Removed the Product",
       name: product.name,
     });
   } catch (error) {
     console.error("Error deleting product:", error);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
@@ -74,42 +47,58 @@ export const deleteProduct = async (req, res) => {
 };
 
 export const getAllProducts = async (req, res) => {
-  let products = await Product.find({});
-  // console.log("All Products Fetched");
-  res.send(products.map(serializeProduct));
+  try {
+    const products = await productService.fetchAllProducts();
+
+    return res.json(products);
+  } catch (error) {
+    console.error("Error fetching products:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
 };
 
 export const newCollection = async (req, res) => {
-  let products = await Product.find({});
+  try {
+    const newcollection = await productService.fetchNewCollection();
 
-  let newcollection = products.slice(1).slice(-8).map(serializeProduct);
-  if (newcollection) {
-    return res.status(200).json({ newcollection });
+    return res.status(200).json({
+      newcollection,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
 export const popularInWomen = async (req, res) => {
-  const products = await Product.find({ category: "women" });
-  let popularinwomen = products.slice(1).slice(-4).map(serializeProduct);
-  if (popularinwomen) {
-    return res.status(200).json({ popularinwomen });
+  try {
+    const popularinwomen = await productService.fetchPopularWomenProducts();
+
+    return res.status(200).json({
+      popularinwomen,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
 export const updateProduct = async (req, res) => {
   try {
-    const {
-      id,
-      name,
-      image,
-      category,
-      new_price,
-      old_price,
-      stock,
-      sizeStock,
-    } = req.body;
+    const { id } = req.body;
 
-    // Validate that id is provided
     if (!id) {
       return res.status(400).json({
         success: false,
@@ -117,8 +106,7 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // Find the product by MongoDB _id
-    const product = await Product.findById(id);
+    const product = await productService.updateProductById(req.body);
 
     if (!product) {
       return res.status(404).json({
@@ -127,33 +115,15 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    // Calculate total stock from sizeStock if provided
-    let totalStock = stock || product.stock;
-    if (sizeStock) {
-      totalStock = Object.values(sizeStock).reduce((sum, qty) => sum + qty, 0);
-    }
-
-    // Update fields
-    if (name !== undefined) product.name = name;
-    if (image !== undefined) product.image = image;
-    if (category !== undefined) product.category = category;
-    if (new_price !== undefined) product.new_price = new_price;
-    if (old_price !== undefined) product.old_price = old_price;
-    if (sizeStock !== undefined) product.sizeStock = sizeStock;
-
-    product.stock = totalStock;
-    product.available = totalStock > 0;
-
-    await product.save();
-
-    res.json({
+    return res.json({
       success: true,
       message: "Product Updated Successfully",
       product,
     });
   } catch (error) {
     console.error("Error updating product:", error);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
@@ -164,16 +134,7 @@ export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate MongoDB ObjectId format
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    // Use MongoDB's findById
-    const product = await Product.findById(id);
+    const product = await productService.fetchProductById(id);
 
     if (!product) {
       return res.status(404).json({
@@ -182,13 +143,14 @@ export const getProductById = async (req, res) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
-      product: serializeProduct(product),
+      product,
     });
   } catch (error) {
     console.error("Error fetching product:", error);
-    res.status(500).json({
+
+    return res.status(500).json({
       success: false,
       message: "Internal server error",
     });
