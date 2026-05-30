@@ -1,74 +1,161 @@
 import request from "supertest";
 import app from "../src/app.js";
-import Users from "../src/models/UserModel.js";
-import Product from "../src/models/ProductModel.js";
+import prisma from "../src/config/prisma.js";
 
 describe("Analytics API", () => {
   let adminToken;
 
   const adminUser = {
-    email: "admin@example.com",
+    email: "[admin@example.com](mailto:admin@example.com)",
     password: "admin123",
   };
 
   beforeAll(async () => {
-    // Set admin credentials in environment variables for testing
     process.env.ADMIN_EMAIL = adminUser.email;
+
     process.env.ADMIN_PASSWORD = adminUser.password;
 
-    // Login as admin
     const loginRes = await request(app)
       .post("/api/admin/login")
       .send(adminUser);
+
     adminToken = loginRes.body.token;
   });
 
+  beforeEach(async () => {
+    await prisma.productVariant.deleteMany();
+
+    await prisma.productImage.deleteMany();
+
+    await prisma.product.deleteMany();
+
+    await prisma.cartItem.deleteMany();
+
+    await prisma.cart.deleteMany();
+
+    await prisma.wishlistItem.deleteMany();
+
+    await prisma.wishlist.deleteMany();
+
+    await prisma.user.deleteMany({
+      where: {
+        email: {
+          contains: "analytics-user",
+        },
+      },
+    });
+  });
+
   afterAll(async () => {
-    await Users.deleteMany({});
-    await Product.deleteMany({});
+    await prisma.productVariant.deleteMany();
+
+    await prisma.productImage.deleteMany();
+
+    await prisma.product.deleteMany();
+
+    await prisma.cartItem.deleteMany();
+
+    await prisma.cart.deleteMany();
+
+    await prisma.wishlistItem.deleteMany();
+
+    await prisma.wishlist.deleteMany();
+
+    await prisma.user.deleteMany({
+      where: {
+        email: {
+          contains: "analytics-user",
+        },
+      },
+    });
+
+    await prisma.$disconnect();
   });
 
   describe("GET /api/analytics/user-count", () => {
     it("should return 0 when there are no users", async () => {
-      // Clear users for this specific test only
-      await Users.deleteMany({});
+      await prisma.user.deleteMany({
+        where: {
+          email: {
+            contains: "analytics-user",
+          },
+        },
+      });
 
       const res = await request(app)
         .get("/api/analytics/user-count")
         .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.success).toBe(true);
+
       expect(res.body.count).toBe(0);
     });
 
     it("should return correct user count", async () => {
-      // Clear users and create test users directly in database
-      await Users.deleteMany({});
-      await Users.create([
-        {
+      await prisma.user.create({
+        data: {
           name: "User 1",
           email: "analytics-user1@test.com",
-          password: "123456",
+          password: "hashedpassword",
+
+          cart: {
+            create: {
+              totalAmount: 0,
+            },
+          },
+
+          wishlist: {
+            create: {},
+          },
         },
-        {
+      });
+
+      await prisma.user.create({
+        data: {
           name: "User 2",
           email: "analytics-user2@test.com",
-          password: "123456",
+          password: "hashedpassword",
+
+          cart: {
+            create: {
+              totalAmount: 0,
+            },
+          },
+
+          wishlist: {
+            create: {},
+          },
         },
-        {
+      });
+
+      await prisma.user.create({
+        data: {
           name: "User 3",
           email: "analytics-user3@test.com",
-          password: "123456",
+          password: "hashedpassword",
+
+          cart: {
+            create: {
+              totalAmount: 0,
+            },
+          },
+
+          wishlist: {
+            create: {},
+          },
         },
-      ]);
+      });
 
       const res = await request(app)
         .get("/api/analytics/user-count")
         .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.success).toBe(true);
+
       expect(res.body.count).toBe(3);
     });
 
@@ -81,64 +168,88 @@ describe("Analytics API", () => {
 
   describe("GET /api/analytics/product-count", () => {
     it("should return 0 when there are no products", async () => {
-      // Clear products for this specific test only
-      await Product.deleteMany({});
+      await prisma.product.deleteMany();
 
       const res = await request(app)
         .get("/api/analytics/product-count")
         .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.success).toBe(true);
+
       expect(res.body.count).toBe(0);
     });
 
     it("should return correct product count", async () => {
-      // Clear products and create test products
-      await Product.deleteMany({});
-      const products = [
-        {
-          id: 1,
+      await prisma.product.create({
+        data: {
           name: "Product 1",
-          image: "http://example.com/1.jpg",
           category: "men",
-          new_price: 100,
-          old_price: 150,
+          newPrice: 100,
+          oldPrice: 150,
           stock: 10,
           available: true,
+
+          images: {
+            create: [
+              {
+                url: "https://test.com/1.jpg",
+                altText: "Product 1",
+              },
+            ],
+          },
         },
-        {
-          id: 2,
+      });
+
+      await prisma.product.create({
+        data: {
           name: "Product 2",
-          image: "http://example.com/2.jpg",
           category: "women",
-          new_price: 200,
-          old_price: 250,
+          newPrice: 200,
+          oldPrice: 250,
           stock: 5,
           available: true,
+
+          images: {
+            create: [
+              {
+                url: "https://test.com/2.jpg",
+                altText: "Product 2",
+              },
+            ],
+          },
         },
-        {
-          id: 3,
+      });
+
+      await prisma.product.create({
+        data: {
           name: "Product 3",
-          image: "http://example.com/3.jpg",
           category: "kids",
-          new_price: 50,
-          old_price: 75,
+          newPrice: 50,
+          oldPrice: 75,
           stock: 20,
           available: true,
-        },
-      ];
 
-      for (const product of products) {
-        await Product.create(product);
-      }
+          images: {
+            create: [
+              {
+                url: "https://test.com/3.jpg",
+                altText: "Product 3",
+              },
+            ],
+          },
+        },
+      });
 
       const res = await request(app)
         .get("/api/analytics/product-count")
         .set("auth-token", adminToken);
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.success).toBe(true);
+
       expect(res.body.count).toBe(3);
     });
 

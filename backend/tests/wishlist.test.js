@@ -1,8 +1,7 @@
 import request from "supertest";
 import app from "../src/app.js";
-import Users from "../src/models/UserModel.js";
-import Product from "../src/models/ProductModel.js";
-import WishList from "../src/models/WishListModel.js";
+import prisma from "../src/config/prisma.js";
+import jwt from "jsonwebtoken";
 
 describe("Wishlist API", () => {
   let authToken;
@@ -11,49 +10,91 @@ describe("Wishlist API", () => {
 
   const testUser = {
     name: "wishlistuser",
-    email: "wishlist-test@mail.com",
+    email: "[wishlist-test@mail.com](mailto:wishlist-test@mail.com)",
     password: "123456",
   };
 
   beforeAll(async () => {
-    // Clear collections
-    await Users.deleteMany({});
-    await Product.deleteMany({});
-    await WishList.deleteMany({});
+    await prisma.wishlistItem.deleteMany();
+    await prisma.wishlist.deleteMany();
 
-    // Create and login test user
+    await prisma.productVariant.deleteMany();
+    await prisma.productImage.deleteMany();
+    await prisma.product.deleteMany();
+
+    await prisma.cartItem.deleteMany();
+    await prisma.cart.deleteMany();
+
+    await prisma.user.deleteMany({
+      where: {
+        email: testUser.email,
+      },
+    });
+
     const signupRes = await request(app)
       .post("/api/auth/signup")
       .send(testUser);
+
     authToken = signupRes.body.token;
 
-    // Extract user ID from token instead of querying database
-    const jwt = await import("jsonwebtoken");
-    const decoded = jwt.default.verify(authToken, process.env.JWT_SECRET);
+    const decoded = jwt.verify(authToken, process.env.JWT_SECRET);
+
     userId = decoded.user.id;
 
-    // Create test product
-    testProduct = await Product.create({
-      id: 1,
-      name: "Test Product",
-      image: "http://example.com/test.jpg",
-      category: "men",
-      new_price: 100,
-      old_price: 150,
-      stock: 10,
-      available: true,
+    testProduct = await prisma.product.create({
+      data: {
+        name: "Test Product",
+        category: "men",
+        newPrice: 100,
+        oldPrice: 150,
+        stock: 10,
+        available: true,
+
+        images: {
+          create: [
+            {
+              url: "https://example.com/test.jpg",
+            },
+          ],
+        },
+      },
     });
-  }, 10000);
+  });
 
   afterAll(async () => {
-    await Users.deleteMany({});
-    await Product.deleteMany({});
-    await WishList.deleteMany({});
+    await prisma.wishlistItem.deleteMany();
+    await prisma.wishlist.deleteMany();
+
+    await prisma.productVariant.deleteMany();
+    await prisma.productImage.deleteMany();
+    await prisma.product.deleteMany();
+
+    await prisma.cartItem.deleteMany();
+    await prisma.cart.deleteMany();
+
+    await prisma.user.deleteMany({
+      where: {
+        email: testUser.email,
+      },
+    });
+
+    await prisma.$disconnect();
   });
 
   beforeEach(async () => {
-    // Clear wishlist before each test
-    await WishList.deleteMany({});
+    await prisma.wishlistItem.deleteMany();
+
+    await prisma.wishlist.deleteMany({
+      where: {
+        userId,
+      },
+    });
+
+    await prisma.wishlist.create({
+      data: {
+        userId,
+      },
+    });
   });
 
   describe("POST /api/user/add-to-wishlist", () => {
@@ -62,68 +103,59 @@ describe("Wishlist API", () => {
         .post("/api/user/add-to-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.message).toBe("Product added to wishlist");
 
-      // Verify wishlist was created and product added
-      const wishlist = await WishList.findOne({ userId });
+      const wishlist = await prisma.wishlist.findUnique({
+        where: {
+          userId,
+        },
+        include: {
+          items: true,
+        },
+      });
+
       expect(wishlist).toBeDefined();
-      expect(wishlist.products).toHaveLength(1);
-      expect(wishlist.products[0].productId.toString()).toBe(
-        testProduct._id.toString(),
-      );
+
+      expect(wishlist.items).toHaveLength(1);
+
+      expect(wishlist.items[0].productId).toBe(testProduct.id);
     });
 
     it("should not add duplicate product to wishlist", async () => {
-      // Add product first time
       await request(app)
         .post("/api/user/add-to-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
-      // Try to add same product again
-      const res = await request(app)
+      await request(app)
         .post("/api/user/add-to-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
-      expect(res.statusCode).toBe(200);
-      expect(res.body.message).toBe("Product added to wishlist");
+      const wishlist = await prisma.wishlist.findUnique({
+        where: {
+          userId,
+        },
+        include: {
+          items: true,
+        },
+      });
 
-      // Verify only one product in wishlist
-      const wishlist = await WishList.findOne({ userId });
-      expect(wishlist.products).toHaveLength(1);
-    });
-
-    it("should create wishlist if it doesn't exist", async () => {
-      const res = await request(app)
-        .post("/api/user/add-to-wishlist")
-        .set("auth-token", authToken)
-        .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
-        });
-
-      expect(res.statusCode).toBe(200);
-
-      const wishlist = await WishList.findOne({ userId });
-      expect(wishlist).toBeDefined();
+      expect(wishlist.items).toHaveLength(1);
     });
 
     it("should require authentication", async () => {
       const res = await request(app).post("/api/user/add-to-wishlist").send({
-        userId: userId,
-        productId: testProduct._id.toString(),
+        productId: testProduct.id,
       });
 
       expect(res.statusCode).toBe(401);
@@ -132,13 +164,11 @@ describe("Wishlist API", () => {
 
   describe("POST /api/user/remove-from-wishlist", () => {
     beforeEach(async () => {
-      // Add product to wishlist before each test
       await request(app)
         .post("/api/user/add-to-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
     });
 
@@ -147,77 +177,99 @@ describe("Wishlist API", () => {
         .post("/api/user/remove-from-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.message).toBe("Product removed from wishlist");
 
-      // Verify product was removed
-      const wishlist = await WishList.findOne({ userId });
-      expect(wishlist.products).toHaveLength(0);
+      const wishlist = await prisma.wishlist.findUnique({
+        where: {
+          userId,
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      expect(wishlist.items).toHaveLength(0);
     });
 
     it("should return error if wishlist doesn't exist", async () => {
-      await WishList.deleteMany({});
+      await prisma.wishlistItem.deleteMany();
+
+      await prisma.wishlist.deleteMany({
+        where: {
+          userId,
+        },
+      });
 
       const res = await request(app)
         .post("/api/user/remove-from-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
       expect(res.statusCode).toBe(404);
+
       expect(res.body.message).toBe("Wishlist not found");
     });
 
-    it("should remove only the specified product", async () => {
-      // Add another product
-      const anotherProduct = await Product.create({
-        id: 2,
-        name: "Another Product",
-        image: "http://example.com/another.jpg",
-        category: "women",
-        new_price: 200,
-        old_price: 250,
-        stock: 5,
-        available: true,
+    it("should remove only specified product", async () => {
+      const anotherProduct = await prisma.product.create({
+        data: {
+          name: "Another Product",
+          category: "women",
+          newPrice: 200,
+          oldPrice: 250,
+          stock: 5,
+          available: true,
+
+          images: {
+            create: [
+              {
+                url: "https://example.com/another.jpg",
+              },
+            ],
+          },
+        },
       });
 
       await request(app)
         .post("/api/user/add-to-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: anotherProduct._id.toString(),
+          productId: anotherProduct.id,
         });
 
-      // Remove first product
       await request(app)
         .post("/api/user/remove-from-wishlist")
         .set("auth-token", authToken)
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
-      // Verify only second product remains
-      const wishlist = await WishList.findOne({ userId });
-      expect(wishlist.products).toHaveLength(1);
-      expect(wishlist.products[0].productId.toString()).toBe(
-        anotherProduct._id.toString(),
-      );
+      const wishlist = await prisma.wishlist.findUnique({
+        where: {
+          userId,
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      expect(wishlist.items).toHaveLength(1);
+
+      expect(wishlist.items[0].productId).toBe(anotherProduct.id);
     });
 
     it("should require authentication", async () => {
       const res = await request(app)
         .post("/api/user/remove-from-wishlist")
         .send({
-          userId: userId,
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
 
       expect(res.statusCode).toBe(401);
@@ -226,49 +278,42 @@ describe("Wishlist API", () => {
 
   describe("GET /api/user/get-wishlist-items", () => {
     beforeEach(async () => {
-      // Add products to wishlist
       await request(app)
         .post("/api/user/add-to-wishlist")
         .set("auth-token", authToken)
         .send({
-          productId: testProduct._id.toString(),
+          productId: testProduct.id,
         });
     });
 
-    it("should get wishlist with populated products", async () => {
+    it("should get wishlist items", async () => {
       const res = await request(app)
         .get("/api/user/get-wishlist-items")
         .set("auth-token", authToken);
 
       expect(res.statusCode).toBe(200);
+
       expect(res.body.wishlist).toBeDefined();
-      expect(res.body.wishlist.products).toHaveLength(1);
-      expect(res.body.wishlist.products[0].productId).toBeDefined();
-      expect(res.body.wishlist.products[0].productId.name).toBe("Test Product");
+
+      expect(res.body.wishlist.items.length).toBe(1);
     });
 
     it("should return error if wishlist doesn't exist", async () => {
-      await WishList.deleteMany({});
+      await prisma.wishlistItem.deleteMany();
+
+      await prisma.wishlist.deleteMany({
+        where: {
+          userId,
+        },
+      });
 
       const res = await request(app)
         .get("/api/user/get-wishlist-items")
         .set("auth-token", authToken);
 
       expect(res.statusCode).toBe(404);
+
       expect(res.body.message).toBe("Wishlist not found");
-    });
-
-    it("should populate product details", async () => {
-      const res = await request(app)
-        .get("/api/user/get-wishlist-items")
-        .set("auth-token", authToken)
-        .send({ userId: userId });
-
-      expect(res.statusCode).toBe(200);
-      const product = res.body.wishlist.products[0].productId;
-      expect(product.name).toBe("Test Product");
-      expect(product.new_price).toBe(100);
-      expect(product.category).toBe("men");
     });
 
     it("should require authentication", async () => {

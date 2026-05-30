@@ -1,29 +1,36 @@
-import mongoose from "mongoose";
 import dotenv from "dotenv";
+import prisma from "../src/config/prisma.js";
 
 dotenv.config();
 
-// Set up before all tests
 beforeAll(async () => {
-  try {
-    const dbKey = process.env.DATABASE_TEST_URL;
-    if (!dbKey) {
-      throw new Error("DATABASE_TEST_KEY environment variable is not set");
-    }
-    await mongoose.connect(dbKey);
-    console.log("✅ Test database connected");
-  } catch (error) {
-    console.error("❌ Test database connection failed:", error.message);
-    throw error;
-  }
+  await prisma.$connect();
 });
 
-// Clean up after all tests
+beforeEach(async () => {
+  await prisma.promoCodeUsage.deleteMany();
+  await prisma.promoCode.deleteMany();
+
+  await prisma.review.deleteMany();
+
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
+
+  await prisma.wishlistItem.deleteMany();
+  await prisma.wishlist.deleteMany();
+
+  await prisma.address.deleteMany();
+
+  await prisma.productVariant.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+
+  await prisma.user.deleteMany();
+});
+
 afterAll(async () => {
-  try {
-    await mongoose.connection.close();
-    console.log("✅ Test database connection closed");
-  } catch (error) {
-    console.error("❌ Error closing test database:", error.message);
-  }
+  await prisma.$disconnect();
 });
