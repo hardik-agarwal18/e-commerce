@@ -3,7 +3,6 @@ import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
 
-import connectDatabase from "./config/db.js";
 import AuthRoutes from "./routes/AuthRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import UploadRoutes from "./routes/UploadRoutes.js";
@@ -50,9 +49,9 @@ app.use(morgan("dev"));
 
 // Database connection with mongodb
 // Don't auto-connect in test environment - tests will manage connections
-if (process.env.NODE_ENV !== "test") {
-  connectDatabase();
-}
+// if (process.env.NODE_ENV !== "test") {
+//   connectDatabase();
+// }
 
 // Api Creation
 app.get("/", (req, res) => {

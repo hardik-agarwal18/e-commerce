@@ -1,15 +1,16 @@
 import express from "express";
 import {
-  getProductsCount,
   userCount,
-} from "../controllers/AnalyticsController.js";
-import { isSignedIn } from "../middleware/auth.js";
-import isAdmin from "../middleware/admin.js";
+  getProductsCount,
+  getDashboardStats,
+} from "../controllers/dashboardController.js";
 
 const router = express.Router();
 
-router.get("/user-count", isSignedIn, isAdmin, userCount);
+router.get("/users/count", userCount);
 
-router.get("/product-count", isSignedIn, isAdmin, getProductsCount);
+router.get("/products/count", getProductsCount);
+
+router.get("/stats", getDashboardStats);
 
 export default router;

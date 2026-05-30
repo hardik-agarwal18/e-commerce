@@ -1,26 +1,44 @@
-import jwt from "jsonwebtoken";
+import * as adminService from "../services/admin.service.js";
 
 export const adminLogin = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
+    const token = await adminService.loginAdmin(email, password);
 
-  if (email === adminEmail && password === adminPassword) {
-    const data = {
-      user: {
-        id: "admin_user",
-        role: "admin",
-      },
-    };
-    const token = jwt.sign(data, process.env.JWT_SECRET);
-    res.json({ success: true, token });
-  } else {
-    res.status(400).json({ success: false, errors: "Invalid Credentials" });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      success: true,
+      token,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      errors: error.message,
+    });
   }
 };
 
 export const adminLogout = async (req, res) => {
-  res.clearCookie("token");
-  res.json({ success: true, message: "Admin logged out successfully" });
+  try {
+    await adminService.logoutAdmin();
+
+    res.clearCookie("token");
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin logged out successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
