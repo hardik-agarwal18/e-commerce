@@ -1,117 +1,203 @@
-import { useState, useEffect } from "react";
-import "./css/Dashboard.css";
+import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
+import "./css/Dashboard.css";
 
 const Dashboard = () => {
-  const [productCount, setProductCount] = useState(0);
-  const [userCount, setUserCount] = useState(0);
-  const [orderCount, setOrderCount] = useState(0);
-  const [orderStats, setOrderStats] = useState({
-    pending: 0,
-    processing: 0,
-    shipped: 0,
-    delivered: 0,
-    cancelled: 0,
-    totalRevenue: 0,
-  });
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboard = async () => {
+    try {
+      const { data } = await axiosInstance.get("/admin/dashboard");
+
+      setDashboard(data.dashboard);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchProductCount = async () => {
-      try {
-        const response = await axiosInstance.get("/analytics/product-count");
-        setProductCount(response.data.count);
-      } catch (error) {
-        console.error("Error fetching total products:", error);
-      }
-    };
-
-    const fetchUserCount = async () => {
-      try {
-        const response = await axiosInstance.get("/analytics/user-count");
-        setUserCount(response.data.count);
-      } catch (error) {
-        console.error("Error fetching total users:", error);
-      }
-    };
-
-    const fetchOrderStats = async () => {
-      try {
-        const response = await axiosInstance.get("/orders/admin/all");
-        if (response.data.success) {
-          const orders = response.data.orders;
-          setOrderCount(orders.length);
-
-          const stats = {
-            pending: orders.filter((o) => o.status === "pending").length,
-            processing: orders.filter((o) => o.status === "processing").length,
-            shipped: orders.filter((o) => o.status === "shipped").length,
-            delivered: orders.filter((o) => o.status === "delivered").length,
-            cancelled: orders.filter((o) => o.status === "cancelled").length,
-            totalRevenue: orders
-              .filter((o) => o.status !== "cancelled")
-              .reduce((sum, order) => sum + order.totalAmount, 0),
-          };
-          setOrderStats(stats);
-        }
-      } catch (error) {
-        console.error("Error fetching order statistics:", error);
-      }
-    };
-
-    fetchProductCount();
-    fetchUserCount();
-    fetchOrderStats();
+    fetchDashboard();
   }, []);
+
+  if (loading) {
+    return <div className="dashboard-loading">Loading Dashboard... </div>;
+  }
+
+  const {
+    overview,
+    orders,
+    usersStats,
+    productsStats,
+    revenue,
+    averageOrderValue,
+    topSellingProducts,
+    recentOrders,
+  } = dashboard;
 
   return (
     <div className="dashboard">
-      <h1>Welcome to the Admin Panel</h1>
-      <p>
-        This is your dashboard. You can manage products, orders, and view site
-        statistics here.
-      </p>
-      <div className="dashboard-stats">
-        <div className="stat-card">
-          <h2>Total Products</h2>
-          <p>{productCount}</p>
+      <div className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <p>Monitor sales, orders, products and users.</p>
+      </div>
+
+      {/* Overview */}
+
+      <div className="stats-grid">
+        <div className="card">
+          <h3>Total Revenue</h3>
+          <p>₹{overview.revenue.toLocaleString()}</p>
         </div>
-        <div className="stat-card">
-          <h2>Total Users</h2>
-          <p>{userCount}</p>
+
+        <div className="card">
+          <h3>Total Orders</h3>
+          <p>{overview.orders}</p>
         </div>
-        <div className="stat-card">
-          <h2>Total Orders</h2>
-          <p>{orderCount}</p>
+
+        <div className="card">
+          <h3>Total Products</h3>
+          <p>{overview.products}</p>
+        </div>
+
+        <div className="card">
+          <h3>Total Users</h3>
+          <p>{overview.users}</p>
         </div>
       </div>
 
-      <div className="dashboard-orders-section">
-        <h2>Order Statistics</h2>
-        <div className="order-stats-grid">
-          <div className="order-stat-card pending">
-            <h3>Pending Orders</h3>
-            <p className="stat-number">{orderStats.pending}</p>
+      {/* Revenue */}
+
+      <div className="section">
+        <h2>Revenue Analytics</h2>
+
+        <div className="stats-grid">
+          <div className="card">
+            <h3>Today</h3>
+            <p>₹{revenue.today}</p>
           </div>
-          <div className="order-stat-card processing">
+
+          <div className="card">
+            <h3>Weekly</h3>
+            <p>₹{revenue.weekly}</p>
+          </div>
+
+          <div className="card">
+            <h3>Monthly</h3>
+            <p>₹{revenue.monthly}</p>
+          </div>
+
+          <div className="card">
+            <h3>Average Order Value</h3>
+            <p>₹{averageOrderValue.toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Orders */}
+
+      <div className="section">
+        <h2>Order Status</h2>
+
+        <div className="stats-grid">
+          <div className="card pending">
+            <h3>Pending</h3>
+            <p>{orders.pendingOrders}</p>
+          </div>
+
+          <div className="card processing">
             <h3>Processing</h3>
-            <p className="stat-number">{orderStats.processing}</p>
+            <p>{orders.processingOrders}</p>
           </div>
-          <div className="order-stat-card shipped">
+
+          <div className="card shipped">
             <h3>Shipped</h3>
-            <p className="stat-number">{orderStats.shipped}</p>
+            <p>{orders.shippedOrders}</p>
           </div>
-          <div className="order-stat-card delivered">
+
+          <div className="card delivered">
             <h3>Delivered</h3>
-            <p className="stat-number">{orderStats.delivered}</p>
+            <p>{orders.deliveredOrders}</p>
           </div>
-          <div className="order-stat-card cancelled">
+
+          <div className="card cancelled">
             <h3>Cancelled</h3>
-            <p className="stat-number">{orderStats.cancelled}</p>
+            <p>{orders.cancelledOrders}</p>
           </div>
-          <div className="order-stat-card revenue">
-            <h3>Total Revenue</h3>
-            <p className="stat-number">${orderStats.totalRevenue.toFixed(2)}</p>
+        </div>
+      </div>
+
+      {/* Inventory */}
+
+      <div className="section">
+        <h2>Inventory</h2>
+
+        <div className="stats-grid">
+          <div className="card">
+            <h3>In Stock</h3>
+            <p>{productsStats.inStockProducts}</p>
           </div>
+
+          <div className="card">
+            <h3>Low Stock</h3>
+            <p>{productsStats.lowStockProducts}</p>
+          </div>
+
+          <div className="card">
+            <h3>Out Of Stock</h3>
+            <p>{productsStats.outOfStockProducts}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Top Products */}
+
+      <div className="section">
+        <h2>Top Selling Products</h2>
+
+        <div className="top-products">
+          {topSellingProducts.map((item) => (
+            <div key={item.productId} className="top-product">
+              <span>{item.product?.name}</span>
+
+              <span>{item._sum.quantity} sold</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Orders */}
+
+      <div className="section">
+        <h2>Recent Orders</h2>
+
+        <div className="orders-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>User</th>
+                <th>Status</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {recentOrders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.orderNumber}</td>
+
+                  <td>{order.user?.name}</td>
+
+                  <td>{order.status}</td>
+
+                  <td>₹{Number(order.totalAmount).toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

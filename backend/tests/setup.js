@@ -6,9 +6,9 @@ dotenv.config();
 // Set up before all tests
 beforeAll(async () => {
   try {
-    const dbKey = process.env.MONGODB_TEST_KEY;
+    const dbKey = process.env.DATABASE_TEST_URL;
     if (!dbKey) {
-      throw new Error("MONGODB_TEST_KEY environment variable is not set");
+      throw new Error("DATABASE_TEST_KEY environment variable is not set");
     }
     await mongoose.connect(dbKey);
     console.log("✅ Test database connected");
