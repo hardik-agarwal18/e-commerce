@@ -1,8 +1,18 @@
 import prisma from "../config/prisma.js";
 
 const serializeProduct = (product) => ({
-  ...product,
+  id: product.id,
+  name: product.name,
+  category: product.category,
+
   image: product.images?.[0]?.url || null,
+
+  new_price: Number(product.newPrice),
+  old_price: Number(product.oldPrice),
+
+  stock: product.stock,
+  available: product.available,
+
   sizeStock:
     product.variants?.reduce((acc, variant) => {
       acc[variant.size] = variant.stock;
@@ -51,14 +61,22 @@ export const createProduct = async (productData) => {
           }
         : undefined,
     },
+    include: {
+      images: true,
+      variants: true,
+    },
   });
 
-  return product;
+  return serializeProduct(product);
 };
 
 export const removeProduct = async (id) => {
   const existingProduct = await prisma.product.findUnique({
     where: { id },
+    include: {
+      images: true,
+      variants: true,
+    },
   });
 
   if (!existingProduct) {
@@ -69,7 +87,7 @@ export const removeProduct = async (id) => {
     where: { id },
   });
 
-  return existingProduct;
+  return serializeProduct(existingProduct);
 };
 
 export const fetchAllProducts = async () => {
@@ -88,16 +106,17 @@ export const fetchAllProducts = async () => {
 
 export const fetchNewCollection = async () => {
   const products = await prisma.product.findMany({
+    take: 8,
+    orderBy: {
+      createdAt: "desc",
+    },
     include: {
       images: true,
       variants: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
   });
 
-  return products.slice(1).slice(-8).map(serializeProduct);
+  return products.map(serializeProduct);
 };
 
 export const fetchPopularWomenProducts = async () => {
@@ -105,16 +124,17 @@ export const fetchPopularWomenProducts = async () => {
     where: {
       category: "women",
     },
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
+    },
     include: {
       images: true,
       variants: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
   });
 
-  return products.slice(1).slice(-4).map(serializeProduct);
+  return products.map(serializeProduct);
 };
 
 export const updateProductById = async (data) => {
@@ -167,13 +187,17 @@ export const updateProductById = async (data) => {
         },
       });
 
-      await tx.productVariant.createMany({
-        data: Object.entries(sizeStock).map(([size, qty]) => ({
-          productId: id,
-          size,
-          stock: qty,
-        })),
-      });
+      const variants = Object.entries(sizeStock);
+
+      if (variants.length > 0) {
+        await tx.productVariant.createMany({
+          data: variants.map(([size, qty]) => ({
+            productId: id,
+            size,
+            stock: qty,
+          })),
+        });
+      }
     }
 
     return tx.product.update({
